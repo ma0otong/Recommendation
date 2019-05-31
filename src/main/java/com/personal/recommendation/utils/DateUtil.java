@@ -16,11 +16,14 @@ public class DateUtil {
      * @return none
      */
     public static Date getDateBeforeDays(int days) {
-        Calendar calendar = Calendar.getInstance(); // 得到日历
-        calendar.add(Calendar.DAY_OF_MONTH, -days); // 设置为前beforeNum天
+        // 得到日历
+        Calendar calendar = Calendar.getInstance();
+        // 设置为前beforeNum天
+        calendar.add(Calendar.DAY_OF_MONTH, -days);
         return new Timestamp(calendar.getTime().getTime());
     }
 
+    @SuppressWarnings("unused")
     public static Timestamp getCertainTimestamp() {
         // 得到日历
         Calendar calendar = Calendar.getInstance();

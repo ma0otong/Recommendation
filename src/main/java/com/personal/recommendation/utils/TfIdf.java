@@ -2,19 +2,13 @@ package com.personal.recommendation.utils;
 
 import org.ansj.app.keyword.KeyWordComputer;
 import org.ansj.app.keyword.Keyword;
-import org.ansj.domain.Result;
-import org.ansj.splitWord.analysis.ToAnalysis;
 
 import java.util.List;
 
 /**
  * TF-IDF实现类
  */
-@SuppressWarnings("unused")
 public class TfIdf {
-    public static Result split(String text) {
-        return ToAnalysis.parse(text);
-    }
 
     /**
      *
@@ -24,8 +18,6 @@ public class TfIdf {
      * @return List<Keyword>
      */
     public static List<Keyword> getTfIde(String title, String content, int keyNums) {
-        // String
-        // sentence="我今天很开心，所以一口气买了好多东西。然而我一不小心把本月预算透支了，现在有很不开心了，因为后面的日子得吃土了！";
         KeyWordComputer kwc = new KeyWordComputer(keyNums);
         return kwc.computeArticleTfidf(title, content);
     }
@@ -36,6 +28,7 @@ public class TfIdf {
      * @param keyNums 返回的关键词数目
      * @return List<Keyword>
      */
+    @SuppressWarnings("unused")
     public static List<Keyword> getTfIde(String content, int keyNums) {
         KeyWordComputer kwc = new KeyWordComputer(keyNums);
         return kwc.computeArticleTfidf(content);

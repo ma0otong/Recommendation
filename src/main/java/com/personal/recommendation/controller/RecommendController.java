@@ -1,6 +1,5 @@
 package com.personal.recommendation.controller;
 
-import com.personal.recommendation.constant.ResultEnum;
 import com.personal.recommendation.model.BaseRsp;
 import com.personal.recommendation.service.CalculatorService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +27,7 @@ public class RecommendController {
     public BaseRsp runTestData(@RequestParam("uid") Long uid, @RequestParam("type") int type) {
         List<Long> idList = new ArrayList<>();
         idList.add(uid);
-        return new BaseRsp(ResultEnum.SUCCESS, calculatorService.executeInstantJob(idList, type));
+        return calculatorService.executeInstantJob(idList, type);
     }
 
 }

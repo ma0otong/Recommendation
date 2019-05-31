@@ -1,7 +1,7 @@
 package com.personal.recommendation.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.personal.recommendation.constant.ResultEnum;
+import com.personal.recommendation.constants.ResultEnum;
 
 import java.io.Serializable;
 

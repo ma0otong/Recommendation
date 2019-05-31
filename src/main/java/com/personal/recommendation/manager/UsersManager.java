@@ -39,8 +39,9 @@ public class UsersManager {
         return list;
     }
 
-    public void updateUserTimeStamp(Date timestamp, Long userId){
-        usersDAO.updateUserTimeStamp(timestamp, userId);
+    @SuppressWarnings("unused")
+    public void updateUserTimeStamp(Date timestamp){
+        usersDAO.updateTimeStamp(timestamp);
     }
 
     public HashMap<Long, CustomizedHashMap<Integer, CustomizedHashMap<String, Double>>> getUserPrefListMap(List<Long> userIds) {

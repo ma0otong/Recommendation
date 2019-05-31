@@ -1,6 +1,7 @@
 package com.personal.recommendation.dao;
 
 import com.personal.recommendation.model.NewsLogs;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -17,13 +18,6 @@ public interface NewsLogsDAO {
 
     String TABLE = "news_logs";
 
-    //用户id列名
-    String PREF_TABLE_USER_ID = "user_id";
-    //新闻id列名
-    String PREF_TABLE_NEWS_ID = "news_id";
-    //用户浏览时间列名
-    String PREF_TABLE_TIME = "view_time";
-
     @Select("select news_id,count(*) as visitNums from "
             + TABLE + " where view_time > #{hotDateTime} group by news_id order by visitNums desc")
     List<NewsLogs> getHotNews(@Param("hotDateTime") Date hotDateTime);
@@ -34,9 +28,16 @@ public interface NewsLogsDAO {
     @Select("select * from " + TABLE)
     List<NewsLogs> getAll();
 
-    @Select("select * from " + TABLE + " where view_time > #{viewTime}")
-    List<NewsLogs> getNewsLogsByViewTime(@Param("viewTime") Date viewTime);
+    @Select("select * from " + TABLE + " where view_time > #{viewTime} and user_id = #{userId}")
+    List<NewsLogs> getNewsLogsByUserViewTime(@Param("viewTime") Date viewTime, @Param("userId") Long userId);
 
-    @Update("update " + TABLE + " set view_time = #{viewTime}")
+    @Update("update " + TABLE + " set view_time = #{viewTime} where id > 0")
     void updateViewTime(@Param("viewTime") Date viewTime);
+
+    @Select("select * from " + TABLE + " where user_id = #{userId}")
+    List<NewsLogs> getNewsByUserId(@Param("userId") Long userId);
+
+    @Insert("insert into " + TABLE + " set user_id = #{userId},news_id = #{newsId}")
+    void insertNewsLogs(NewsLogs newsLog);
+
 }

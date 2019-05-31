@@ -1,10 +1,10 @@
-package com.personal.recommendation.constant;
+package com.personal.recommendation.constants;
 
 /**
  * 推荐算法枚举类
  */
 @SuppressWarnings("unused")
-public enum RecommendEnum {
+public enum RecommendationEnum {
 
     CF(0,"协同过滤"),
     CB(1,"基于内容"),
@@ -13,7 +13,7 @@ public enum RecommendEnum {
     private int code;
     private String desc;
 
-    RecommendEnum(int code, String desc){
+    RecommendationEnum(int code, String desc){
         this.code = code;
         this.desc = desc;
     }

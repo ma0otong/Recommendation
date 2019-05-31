@@ -1,7 +1,5 @@
 package com.personal.recommendation.service;
 
-import com.personal.recommendation.service.RecommendationAlgorithmService;
-
 import java.util.HashMap;
 import java.util.Map;
 

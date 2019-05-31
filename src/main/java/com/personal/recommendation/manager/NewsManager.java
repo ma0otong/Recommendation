@@ -44,4 +44,9 @@ public class NewsManager  {
     public void updateNewsTime(Date newsTime){
         newsDAO.updateNewsTime(newsTime);
     }
+
+    public Long getRandomNewsByModule(Long moduleId){
+        return newsDAO.getRandomNewsByModule(moduleId);
+    }
+
 }

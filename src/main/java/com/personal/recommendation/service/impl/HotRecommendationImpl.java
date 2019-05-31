@@ -1,10 +1,13 @@
 package com.personal.recommendation.service.impl;
 
-import com.personal.recommendation.constant.RecommendEnum;
+import com.personal.recommendation.constants.RecommendationConstants;
+import com.personal.recommendation.constants.RecommendationEnum;
+import com.personal.recommendation.constants.ResultEnum;
 import com.personal.recommendation.manager.NewsLogsManager;
 import com.personal.recommendation.manager.NewsManager;
 import com.personal.recommendation.manager.RecommendationsManager;
 import com.personal.recommendation.manager.UsersManager;
+import com.personal.recommendation.model.BaseRsp;
 import com.personal.recommendation.model.News;
 import com.personal.recommendation.model.Users;
 import com.personal.recommendation.service.CalculatorService;
@@ -17,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.sql.Timestamp;
 import java.util.*;
 
 /**
@@ -44,42 +46,48 @@ public class HotRecommendationImpl implements RecommendationAlgorithmService {
 
     @PostConstruct
     void init() {
-        AlgorithmFactory.addHandler(RecommendEnum.HR.getCode(), this);
+        AlgorithmFactory.addHandler(RecommendationEnum.HR.getCode(), this);
     }
 
     @Override
-    public Object recommend(List<Long> users) {
+    public BaseRsp recommend(List<Long> users) {
+        long start = new Date().getTime();
+        logger.info("HR start at " + start + ", userList : " + users);
+
         // 保存推荐结果
         Map<Users, List<News>> resultMap = new HashMap<>();
 
         int count = 0;
-        Timestamp timestamp = DateUtil.getCertainTimestamp();
+        Date timestamp = DateUtil.getDateBeforeDays(RecommendationConstants.HOT_DATA_DAYS);
         for (Long uid : users) {
             try {
                 // 获得已经预备为当前用户推荐的新闻，若数目不足达不到单次的最低推荐数目要求，则用热点新闻补充
                 int tmpRecNums = recommendationsManager.getUserRecNumByDeriveTime(uid, timestamp);
 
                 // 推荐系统每日为每位用户生成的推荐结果的总数，当CF与CB算法生成的推荐结果数不足此数时，由该算法补充
-                int TOTAL_REC_NUM = 20;
-                int delta = TOTAL_REC_NUM - tmpRecNums;
+                int delta = RecommendationConstants.TOTAL_REC_NUM - tmpRecNums;
                 Set<Long> toBeRecommended = new HashSet<>();
                 if (delta > 0) {
-                    int i = CalculatorService.topHotNewsList.size() > delta ? delta : CalculatorService.topHotNewsList.size();
+                    int i = CalculatorService.topHotNewsList.size() > delta ? delta :
+                            CalculatorService.topHotNewsList.size();
                     while (i-- > 0)
                         toBeRecommended.add(CalculatorService.topHotNewsList.get(i));
                 }
 
-                count = RecommendationUtil.resultHandle(recommendationsManager, newsLogsManager, newsManager, usersManager, toBeRecommended, uid, count, resultMap);
+                count = RecommendationUtil.resultHandle(recommendationsManager, newsLogsManager, newsManager,
+                        usersManager, toBeRecommended, uid, count, resultMap, RecommendationEnum.HR.getCode());
 
             } catch (Exception e) {
                 e.printStackTrace();
+                return new BaseRsp(ResultEnum.FAILURE, ResultEnum.FAILURE.getMsg());
             }
         }
-        logger.info(
-                "HR has contributed " + (users.size() == 0 ? 0 : count / users.size()) + " recommending news on average");
-        logger.info("HR end at " + new Date());
 
-        return resultMap;
+        long end = new Date().getTime();
+        logger.info("HR has contributed " + (count / users.size()) + " recommending news on average");
+        logger.info("HR finished at " + end + ", time cost : " + (double)((end - start)/1000) + "s .");
+
+        return new BaseRsp(ResultEnum.SUCCESS, resultMap);
 
     }
 

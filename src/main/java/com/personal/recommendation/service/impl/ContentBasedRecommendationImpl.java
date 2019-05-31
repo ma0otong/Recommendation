@@ -1,10 +1,13 @@
 package com.personal.recommendation.service.impl;
 
-import com.personal.recommendation.constant.RecommendEnum;
+import com.personal.recommendation.constants.RecommendationConstants;
+import com.personal.recommendation.constants.RecommendationEnum;
+import com.personal.recommendation.constants.ResultEnum;
 import com.personal.recommendation.manager.NewsLogsManager;
 import com.personal.recommendation.manager.NewsManager;
 import com.personal.recommendation.manager.RecommendationsManager;
 import com.personal.recommendation.manager.UsersManager;
+import com.personal.recommendation.model.BaseRsp;
 import com.personal.recommendation.model.News;
 import com.personal.recommendation.model.Users;
 import com.personal.recommendation.service.AlgorithmFactory;
@@ -32,7 +35,8 @@ public class ContentBasedRecommendationImpl implements RecommendationAlgorithmSe
     private final RecommendationsManager recommendationsManager;
 
     @Autowired
-    public ContentBasedRecommendationImpl(UsersManager usersManager, NewsManager newsManager, NewsLogsManager newsLogsManager,
+    public ContentBasedRecommendationImpl(UsersManager usersManager, NewsManager newsManager,
+                                          NewsLogsManager newsLogsManager,
                                           RecommendationsManager recommendationsManager) {
         this.usersManager = usersManager;
         this.newsManager = newsManager;
@@ -42,26 +46,30 @@ public class ContentBasedRecommendationImpl implements RecommendationAlgorithmSe
 
     @PostConstruct
     void init() {
-        AlgorithmFactory.addHandler(RecommendEnum.CB.getCode(), this);
+        AlgorithmFactory.addHandler(RecommendationEnum.CB.getCode(), this);
     }
 
     @Override
-    public Object recommend(List<Long> users) {
+    public BaseRsp recommend(List<Long> users) {
+        long start = new Date().getTime();
+        logger.info("CB start at " + start + ", userList : " + users);
+
         // 保存推荐结果
         Map<Users, List<News>> resultMap = new HashMap<>();
 
         try {
             int count = 0;
-            logger.info("CB start at " + new Date() + ", userList : " + users);
             // 新闻及对应关键词列表的Map
             HashMap<Long, List<Keyword>> newsKeyWordsMap = new HashMap<>();
             HashMap<Long, Integer> newsModuleMap = new HashMap<>();
             // 用户喜好关键词列表
-            HashMap<Long, CustomizedHashMap<Integer, CustomizedHashMap<String, Double>>> userPrefListMap = usersManager.getUserPrefListMap(users);
+            HashMap<Long, CustomizedHashMap<Integer, CustomizedHashMap<String, Double>>> userPrefListMap =
+                    usersManager.getUserPrefListMap(users);
 
-            List<News> newsList = newsManager.getNewsByDateTime(DateUtil.getDateBeforeDays(30));
+            List<News> newsList = newsManager.getNewsByDateTime(DateUtil.getDateBeforeDays(RecommendationConstants.HOT_DATA_DAYS));
             for (News news : newsList) {
-                newsKeyWordsMap.put(news.getId(), TfIdf.getTfIde(news.getTitle(), news.getContent(), TD_IDF_KEY_WORDS_NUM));
+                newsKeyWordsMap.put(news.getId(), TfIdf.getTfIde(news.getTitle(),
+                        news.getContent(), RecommendationConstants.TD_IDF_KEY_WORDS_NUM));
                 newsModuleMap.put(news.getId(), news.getModuleId());
             }
 
@@ -74,7 +82,8 @@ public class ContentBasedRecommendationImpl implements RecommendationAlgorithmSe
                         int moduleId = newsModuleMap.get(newsId);
                         if (null != userPrefListMap.get(uid).get(moduleId)) {
                             tempMatchMap.put(newsId,
-                                    RecommendationUtil.getMatchValue(userPrefListMap.get(uid).get(moduleId), newsKeyWordsMap.get(newsId)));
+                                    RecommendationUtil.getMatchValue(userPrefListMap.get(uid).get(moduleId),
+                                            newsKeyWordsMap.get(newsId)));
                         }
                     } while (ite.hasNext());
                 }
@@ -85,17 +94,21 @@ public class ContentBasedRecommendationImpl implements RecommendationAlgorithmSe
                     Set<Long> toBeRecommended;
                     toBeRecommended = Objects.requireNonNull(tempMatchMap).keySet();
 
-                    count = RecommendationUtil.resultHandle(recommendationsManager, newsLogsManager, newsManager, usersManager, toBeRecommended, uid, count, resultMap);
+                    count = RecommendationUtil.resultHandle(recommendationsManager, newsLogsManager, newsManager,
+                            usersManager, toBeRecommended, uid, count, resultMap, RecommendationEnum.CB.getCode());
 
                 }
             }
+
+            long end = new Date().getTime();
             logger.info("CB has contributed " + (count / users.size()) + " recommending news on average");
-            logger.info("CB finished at " + new Date());
+            logger.info("CB finished at " + end + ", time cost : " + (double)((end - start)/1000) + "s .");
         } catch (Exception e) {
             e.printStackTrace();
+            return new BaseRsp(ResultEnum.FAILURE, ResultEnum.FAILURE.getMsg());
         }
 
-        return resultMap;
+        return new BaseRsp(ResultEnum.SUCCESS, resultMap);
 
     }
 

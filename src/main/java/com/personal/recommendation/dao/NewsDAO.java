@@ -25,4 +25,8 @@ public interface NewsDAO {
 
     @Update("update " + TABLE + " set news_time = #{newsTime}")
     void updateNewsTime(@Param("newsTime") Date newsTime);
+
+    @Select("select id from " + TABLE + " where module_id = #{moduleId} order by RAND() limit 1")
+    Long getRandomNewsByModule(@Param("moduleId") Long moduleId);
+
 }

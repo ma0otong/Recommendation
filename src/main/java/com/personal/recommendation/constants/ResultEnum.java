@@ -1,4 +1,4 @@
-package com.personal.recommendation.constant;
+package com.personal.recommendation.constants;
 
 /**
  * 业务异常基类，所有业务异常都必须继承于此异常 定义异常时，需要先确定异常所属模块。 例如：无效用户可以定义为 [10010001]

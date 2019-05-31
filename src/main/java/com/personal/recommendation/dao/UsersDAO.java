@@ -20,8 +20,8 @@ public interface UsersDAO {
     @Select("select * from " + TABLE + " where id = #{userId}")
     Users getUserById(@Param("userId") long userId);
 
-    @Update("update " + TABLE + " set latest_log_time=#{timestamp} where id = #{userId}")
-    void updateUserTimeStamp(@Param("timestamp") Date timestamp, @Param("userId") Long userId);
+    @Update("update " + TABLE + " set latest_log_time=#{timestamp} where id > 0")
+    void updateTimeStamp(@Param("timestamp") Date timestamp);
 
     @Select("select id from " + TABLE)
     List<Long> getAllUserIds();
