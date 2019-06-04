@@ -12,6 +12,7 @@ public class Users {
     private String prefList;
     private Date latestLogTime;
     private String name;
+    private float similarity;
 
     public Long getId() {
         return id;
@@ -45,8 +46,17 @@ public class Users {
         this.name = name;
     }
 
+    public float getSimilarity() {
+        return similarity;
+    }
+
+    public void setSimilarity(float similarity) {
+        this.similarity = similarity;
+    }
+
     @Override
     public String toString(){
         return name + ":" + prefList;
     }
+
 }

@@ -88,9 +88,8 @@ public class MahoutUserBasedCollaborativeRecommendationImpl implements Recommend
             }
             logger.info("Get newsLogs size (after filter) : " + newsLogList.size());
 
+            // 基于用户
             UserSimilarity similarity = new LogLikelihoodSimilarity(dataModel);
-
-            // NearestNeighborhood的数量有待考察
             UserNeighborhood neighborhood = new NearestNUserNeighborhood(RecommendationConstants.N, similarity, dataModel);
 
             Recommender recommender = new GenericUserBasedRecommender(dataModel, neighborhood, similarity);
@@ -101,6 +100,7 @@ public class MahoutUserBasedCollaborativeRecommendationImpl implements Recommend
 
                 for (RecommendedItem recItem : recItems) {
                     toBeRecommended.add(recItem.getItemID());
+                    logger.info(String.format("Similarity : %s", recItem));
                 }
 
                 count = RecommendationUtil.resultHandle(recommendationsManager, newsLogsManager, newsManager,

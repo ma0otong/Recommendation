@@ -21,7 +21,7 @@ public interface RecommendationConstants {
     int CF_VALID_DAYS = 10;
 
     // TF-IDF提取关键词数
-    int TD_IDF_KEY_WORDS_NUM = 10;
+    int TD_IDF_KEY_WORDS_NUM = 5;
 
     // 推荐新闻数
     int N = 10;
@@ -34,6 +34,9 @@ public interface RecommendationConstants {
 
     // 用户浏览时间列名
     String PREF_TABLE_TIME = "view_time";
+
+    // 浏览记录表明
+    String PREF_TABLE = "news_logs";
 
     // 新闻模块id
     String MODULE_ID = "module_id";

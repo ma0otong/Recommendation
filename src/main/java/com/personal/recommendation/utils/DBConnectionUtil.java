@@ -3,7 +3,6 @@ package com.personal.recommendation.utils;
 import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
 import com.jfinal.plugin.c3p0.C3p0Plugin;
 import com.personal.recommendation.constants.RecommendationConstants;
-import com.personal.recommendation.dao.NewsLogsDAO;
 import org.apache.log4j.Logger;
 import org.apache.mahout.cf.taste.impl.model.jdbc.MySQLBooleanPrefJDBCDataModel;
 
@@ -49,7 +48,7 @@ public class DBConnectionUtil {
     }
 
     public MySQLBooleanPrefJDBCDataModel getMySQLJDBCDataModel() {
-        return new MySQLBooleanPrefJDBCDataModel(getDataSource(), NewsLogsDAO.TABLE,
+        return new MySQLBooleanPrefJDBCDataModel(getDataSource(), RecommendationConstants.PREF_TABLE,
                 RecommendationConstants.PREF_TABLE_USER_ID, RecommendationConstants.PREF_TABLE_NEWS_ID,
                 RecommendationConstants.PREF_TABLE_TIME);
     }

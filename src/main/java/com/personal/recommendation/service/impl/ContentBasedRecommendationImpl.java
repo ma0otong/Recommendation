@@ -66,7 +66,9 @@ public class ContentBasedRecommendationImpl implements RecommendationAlgorithmSe
             HashMap<Long, CustomizedHashMap<Integer, CustomizedHashMap<String, Double>>> userPrefListMap =
                     usersManager.getUserPrefListMap(users);
 
-            List<News> newsList = newsManager.getNewsByDateTime(DateUtil.getDateBeforeDays(RecommendationConstants.HOT_DATA_DAYS));
+            // 获取HOT_DATA_DAYS之前的数据
+            List<News> newsList = newsManager.getNewsByDateTime(
+                    DateUtil.getDateBeforeDays(RecommendationConstants.HOT_DATA_DAYS));
             for (News news : newsList) {
                 newsKeyWordsMap.put(news.getId(), TfIdf.getTfIde(news.getTitle(),
                         news.getContent(), RecommendationConstants.TD_IDF_KEY_WORDS_NUM));
@@ -81,9 +83,8 @@ public class ContentBasedRecommendationImpl implements RecommendationAlgorithmSe
                         Long newsId = ite.next();
                         int moduleId = newsModuleMap.get(newsId);
                         if (null != userPrefListMap.get(uid).get(moduleId)) {
-                            tempMatchMap.put(newsId,
-                                    RecommendationUtil.getMatchValue(userPrefListMap.get(uid).get(moduleId),
-                                            newsKeyWordsMap.get(newsId)));
+                            tempMatchMap.put(newsId, RecommendationUtil.getMatchValue(
+                                    userPrefListMap.get(uid).get(moduleId), newsKeyWordsMap.get(newsId)));
                         }
                     } while (ite.hasNext());
                 }
@@ -91,8 +92,7 @@ public class ContentBasedRecommendationImpl implements RecommendationAlgorithmSe
                 RecommendationUtil.removeZeroItem(tempMatchMap);
                 if (!(tempMatchMap.toString().equals("{}"))) {
                     tempMatchMap = RecommendationUtil.sortMapByValue(tempMatchMap);
-                    Set<Long> toBeRecommended;
-                    toBeRecommended = Objects.requireNonNull(tempMatchMap).keySet();
+                    Set<Long> toBeRecommended = Objects.requireNonNull(tempMatchMap).keySet();
 
                     count = RecommendationUtil.resultHandle(recommendationsManager, newsLogsManager, newsManager,
                             usersManager, toBeRecommended, uid, count, resultMap, RecommendationEnum.CB.getCode());
