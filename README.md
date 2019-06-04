@@ -1,2 +1,2 @@
 # Recommendation
-springboot基于mahout实现的个性化内容推荐
+基于Apache Mahout + Ansj实现的springboot个性化新闻内容推荐系统
