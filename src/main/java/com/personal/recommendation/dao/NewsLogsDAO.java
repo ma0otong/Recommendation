@@ -28,8 +28,10 @@ public interface NewsLogsDAO {
     @Select("select * from " + TABLE)
     List<NewsLogs> getAll();
 
-    @Select("select * from " + TABLE + " where view_time > #{viewTime} and user_id = #{userId}")
-    List<NewsLogs> getNewsLogsByUserViewTime(@Param("viewTime") Date viewTime, @Param("userId") Long userId);
+    @Select("select * from " + TABLE + " where view_time > #{viewTime} and user_id = #{userId} " +
+            "order by view_time desc limit #{recordNum}")
+    List<NewsLogs> getNewsLogsByUserViewTime(@Param("viewTime") Date viewTime,
+                                             @Param("userId") Long userId, @Param("recordNum") int recordNum);
 
     @Update("update " + TABLE + " set view_time = #{viewTime} where id > 0")
     void updateViewTime(@Param("viewTime") Date viewTime);

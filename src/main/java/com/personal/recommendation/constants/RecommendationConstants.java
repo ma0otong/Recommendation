@@ -5,20 +5,17 @@ package com.personal.recommendation.constants;
  */
 public interface RecommendationConstants {
 
-    // 推荐结果总数
-    int TOTAL_REC_NUM = 20;
+    // 设置TF-IDF提取的关键词数目
+    int KEY_WORDS_NUM = 5;
 
-    //设置TF-IDF提取的关键词数目
-    int KEY_WORDS_NUM = 10;
+    // 最近浏览条数
+    int RECENT_VIEWED_NUM = 10;
 
     //每日衰减系数
-    double DEC_CODE = 0.7;
+    double DEC_CODE = 0.8;
 
     // 热点数据天数
     int HOT_DATA_DAYS = 10;
-
-    // 协同过滤有效天数
-    int CF_VALID_DAYS = 10;
 
     // TF-IDF提取关键词数
     int TD_IDF_KEY_WORDS_NUM = 5;

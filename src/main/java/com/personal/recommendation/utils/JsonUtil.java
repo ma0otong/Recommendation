@@ -19,8 +19,7 @@ public class JsonUtil {
         try {
             map = objectMapper.readValue(srcJson, new TypeReference<CustomizedHashMap<Integer, CustomizedHashMap<String, Double>>>() {
             });
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 

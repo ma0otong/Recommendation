@@ -13,6 +13,7 @@ import java.util.List;
  * 新闻Manager
  */
 @Service
+@SuppressWarnings("unused")
 public class NewsManager  {
 
     private final NewsDAO newsDAO;
@@ -21,7 +22,6 @@ public class NewsManager  {
         this.newsDAO = newsDAO;
     }
 
-    @SuppressWarnings("unused")
     public News getNewsById(long newsId){
         return newsDAO.getNewsById(newsId);
     }
@@ -49,4 +49,7 @@ public class NewsManager  {
         return newsDAO.getRandomNewsByModule(moduleId);
     }
 
+    public int getModuleIdCount(){
+        return newsDAO.getModuleIdCount();
+    }
 }

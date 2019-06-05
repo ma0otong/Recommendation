@@ -2,19 +2,10 @@ package com.personal.recommendation.service.impl;
 
 import com.personal.recommendation.constants.RecommendationConstants;
 import com.personal.recommendation.constants.RecommendationEnum;
-import com.personal.recommendation.constants.ResultEnum;
-import com.personal.recommendation.manager.NewsLogsManager;
-import com.personal.recommendation.manager.NewsManager;
-import com.personal.recommendation.manager.RecommendationsManager;
-import com.personal.recommendation.manager.UsersManager;
-import com.personal.recommendation.model.BaseRsp;
-import com.personal.recommendation.model.News;
-import com.personal.recommendation.model.NewsLogs;
 import com.personal.recommendation.model.Users;
 import com.personal.recommendation.service.RecommendationAlgorithmService;
 import com.personal.recommendation.service.AlgorithmFactory;
 import com.personal.recommendation.utils.DBConnectionUtil;
-import com.personal.recommendation.utils.DateUtil;
 import com.personal.recommendation.utils.RecommendationUtil;
 import org.apache.log4j.Logger;
 import org.apache.mahout.cf.taste.common.TasteException;
@@ -26,7 +17,6 @@ import org.apache.mahout.cf.taste.neighborhood.UserNeighborhood;
 import org.apache.mahout.cf.taste.recommender.RecommendedItem;
 import org.apache.mahout.cf.taste.recommender.Recommender;
 import org.apache.mahout.cf.taste.similarity.UserSimilarity;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -40,21 +30,6 @@ public class MahoutUserBasedCollaborativeRecommendationImpl implements Recommend
 
     private static final Logger logger = Logger.getLogger(MahoutUserBasedCollaborativeRecommendationImpl.class);
 
-    private final UsersManager usersManager;
-    private final NewsManager newsManager;
-    private final NewsLogsManager newsLogsManager;
-    private final RecommendationsManager recommendationsManager;
-
-    @Autowired
-    public MahoutUserBasedCollaborativeRecommendationImpl(UsersManager usersManager, NewsManager newsManager,
-                                                          NewsLogsManager newsLogsManager,
-                                                          RecommendationsManager recommendationsManager) {
-        this.usersManager = usersManager;
-        this.newsManager = newsManager;
-        this.newsLogsManager = newsLogsManager;
-        this.recommendationsManager = recommendationsManager;
-    }
-
     @PostConstruct
     void init() {
         AlgorithmFactory.addHandler(RecommendationEnum.CF.getCode(), this);
@@ -64,66 +39,52 @@ public class MahoutUserBasedCollaborativeRecommendationImpl implements Recommend
      * 给特定的一批用户进行新闻推荐
      */
     @Override
-    public BaseRsp recommend(List<Long> users) {
+    public Set<Long> recommend(Users user, int recNum, List<Long> recommendedNews, List<Long> browsedNews) {
         long start = new Date().getTime();
-        logger.info("CF start at " + start + ", userList : " + users);
+        Long userId = user.getId();
+        logger.info(RecommendationEnum.CF.getDesc() + " start at " + start + ", userId : " + userId);
+        logger.info("Recommended data not enough, " + RecommendationEnum.CF.getDesc() + " need fetch " + recNum);
 
         // 保存推荐结果
-        Map<Users, List<News>> resultMap = new HashMap<>();
+        Set<Long> toBeRecommended = new HashSet<>();
 
-        int count = 0;
         try {
             logger.info("CF start at " + new Date());
 
             MySQLBooleanPrefJDBCDataModel dataModel = new DBConnectionUtil().getMySQLJDBCDataModel();
 
-            List<NewsLogs> newsLogList = newsLogsManager.getNewsByUsers(users);
-            logger.info("Get newsLogs size : " + newsLogList.size());
-
-            // 移除过期的用户浏览新闻行为，这些行为对计算用户相似度不再具有较大价值
-            for (NewsLogs newsLog : newsLogList) {
-                if (newsLog.getViewTime().before(DateUtil.getDateBeforeDays(RecommendationConstants.CF_VALID_DAYS))) {
-                    newsLogList.remove(newsLog);
-                }
-            }
-            logger.info("Get newsLogs size (after filter) : " + newsLogList.size());
-
-            // 基于用户
+            // 构造相似度度量器
             UserSimilarity similarity = new LogLikelihoodSimilarity(dataModel);
+            // 构造近邻查找
             UserNeighborhood neighborhood = new NearestNUserNeighborhood(RecommendationConstants.N, similarity, dataModel);
-
+            // 构造推荐器
             Recommender recommender = new GenericUserBasedRecommender(dataModel, neighborhood, similarity);
+            // 获取推荐结果
+            List<RecommendedItem> recItems = recommender.recommend(userId, RecommendationConstants.N);
 
-            for (Long uid : users) {
-                List<RecommendedItem> recItems = recommender.recommend(uid, RecommendationConstants.N);
-                Set<Long> toBeRecommended = new HashSet<>();
-
-                for (RecommendedItem recItem : recItems) {
-                    toBeRecommended.add(recItem.getItemID());
-                    logger.info(String.format("Similarity : %s", recItem));
-                }
-
-                count = RecommendationUtil.resultHandle(recommendationsManager, newsLogsManager, newsManager,
-                        usersManager, toBeRecommended, uid, count, resultMap, RecommendationEnum.CF.getCode());
-
+            for (RecommendedItem recItem : recItems) {
+                toBeRecommended.add(recItem.getItemID());
             }
+
+            toBeRecommended = RecommendationUtil.resultHandle(recommendedNews, browsedNews, toBeRecommended,
+                    userId, RecommendationEnum.CF.getCode(), recNum, false);
+
         } catch (TasteException e) {
             logger.error("CF算法构造偏好对象失败！");
             e.printStackTrace();
-            return new BaseRsp(ResultEnum.FAILURE, ResultEnum.FAILURE.getMsg());
 
         } catch (Exception e) {
             logger.error("CF算法数据库操作失败！");
             e.printStackTrace();
-            return new BaseRsp(ResultEnum.FAILURE, ResultEnum.FAILURE.getMsg());
 
         }
 
         long end = new Date().getTime();
-        logger.info("CF has contributed " + (count / users.size()) + " recommending news on average");
-        logger.info("CF finished at " + end + ", time cost : " + (double)((end - start)/1000) + "s .");
+        if(!toBeRecommended.isEmpty())
+            logger.info("CF has contributed " + toBeRecommended.size() + " recommending news on average");
+        logger.info("CF finished at " + end + ", time cost : " + (double) ((end - start) / 1000) + "s .");
 
-        return new BaseRsp(ResultEnum.SUCCESS, resultMap);
+        return toBeRecommended;
 
     }
 

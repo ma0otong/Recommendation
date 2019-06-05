@@ -29,4 +29,7 @@ public interface NewsDAO {
     @Select("select id from " + TABLE + " where module_id = #{moduleId} order by RAND() limit 1")
     Long getRandomNewsByModule(@Param("moduleId") Long moduleId);
 
+    @Select("select count(distinct(module_id)) from " + TABLE)
+    int getModuleIdCount();
+
 }

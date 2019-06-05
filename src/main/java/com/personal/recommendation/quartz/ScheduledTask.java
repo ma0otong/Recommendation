@@ -1,42 +1,40 @@
-//package com.personal.recommendation.quartz;
-//
-//import com.personal.recommendation.manager.NewsLogsManager;
-//import com.personal.recommendation.manager.NewsManager;
-//import com.personal.recommendation.model.NewsLogs;
-//import org.apache.log4j.Logger;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.context.annotation.Configuration;
-//import org.springframework.scheduling.annotation.EnableScheduling;
-//import org.springframework.scheduling.annotation.Scheduled;
-//import org.springframework.stereotype.Component;
-//
-//import java.util.*;
-//
-///**
-// * 定时器
-// */
-//@Component
-//@Configuration
-//@EnableScheduling
-//public class ScheduledTask {
-//
-//    private static final Logger logger = Logger.getLogger(ScheduledTask.class);
+package com.personal.recommendation.quartz;
+
+import com.personal.recommendation.manager.NewsLogsManager;
+import com.personal.recommendation.manager.NewsManager;
+import com.personal.recommendation.service.CalculatorService;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+import java.util.*;
+
+/**
+ * 定时器
+ */
+@Component
+@Configuration
+@EnableScheduling
+public class ScheduledTask {
+
+    private static final Logger logger = Logger.getLogger(ScheduledTask.class);
 //
 //    private HashMap<Integer, int[]> randomModuleMap = new HashMap<>();
 //
-//    private int MAX_USER_ID;
-//    private int MIN_USER_ID;
-//
-//    private final NewsLogsManager newsLogsManager;
-//    private final NewsManager newsManager;
-//
-//    @Autowired
-//    public ScheduledTask(NewsLogsManager newsLogsManager, NewsManager newsManager) {
-//        this.newsLogsManager = newsLogsManager;
-//        this.newsManager = newsManager;
-//        MAX_USER_ID = 7;
-//        MIN_USER_ID = 1;
-//    }
+//    private int MAX_USER_ID = 7;
+//    private int MIN_USER_ID = 1;
+
+    private final NewsLogsManager newsLogsManager;
+    private final NewsManager newsManager;
+
+    @Autowired
+    public ScheduledTask(NewsLogsManager newsLogsManager, NewsManager newsManager) {
+        this.newsLogsManager = newsLogsManager;
+        this.newsManager = newsManager;
+    }
 //
 //    /**
 //     * 定时新增随机用户浏览记录
@@ -65,18 +63,19 @@
 //        logger.info(String.format("Auto add new newsLog record ... userId : %s, newsId : %s, moduleId : %s",
 //                userId, newsId, moduleId));
 //    }
-//
-//    /**
-//     * 定时更新数据库表时间记录, 确保测试效果
-//     * 仅作为测试用
-//     */
-//    @Scheduled(cron = "0 0 12 * * ?")
-//    private void refreshDBTime() {
-//        logger.info("Refresh db time ");
-//        newsManager.updateNewsTime(new Date());
-//        newsLogsManager.updateViewTime(new Date());
-//    }
-//
+
+    /**
+     * 定时更新数据库表时间记录, 确保测试效果
+     * 仅作为测试用
+     */
+    @Scheduled(cron = "0 0 12 * * ?")
+    private void refreshDBTime() {
+        logger.info("Refresh db time and topHotNewsList");
+        newsManager.updateNewsTime(new Date());
+        newsLogsManager.updateViewTime(new Date());
+        CalculatorService.topHotNewsList.clear();
+    }
+
 //    public void initializeMap(){
 //        randomModuleMap.put(1, new int[]{1, 5, 8, 13});
 //        randomModuleMap.put(2, new int[]{1, 2, 7, 9});
@@ -86,4 +85,4 @@
 //        randomModuleMap.put(6, new int[]{15, 14, 3, 2});
 //        randomModuleMap.put(7, new int[]{4, 7, 12, 6});
 //    }
-//}
+}

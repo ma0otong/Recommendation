@@ -13,6 +13,7 @@ import java.util.List;
  * 新闻日志Manager
  */
 @Service
+@SuppressWarnings("unused")
 public class NewsLogsManager {
 
     private final NewsLogsDAO newsLogsDAO;
@@ -30,17 +31,13 @@ public class NewsLogsManager {
         return newsLogsDAO.getNewsIdByUserId(userId);
     }
 
-    @SuppressWarnings("unused")
+
     public List<NewsLogs> getAll() {
         return newsLogsDAO.getAll();
     }
 
-    public List<NewsLogs> getNewsLogsByUsersViewTime(Date viewTime, List<Long> userList) {
-        List<NewsLogs> list = new ArrayList<>();
-        for(Long userId : userList){
-            list.addAll(newsLogsDAO.getNewsLogsByUserViewTime(viewTime, userId));
-        }
-        return list;
+    public List<NewsLogs> getNewsLogsByUserViewTime(Date viewTime, Long userId, int recordNum) {
+        return newsLogsDAO.getNewsLogsByUserViewTime(viewTime, userId, recordNum);
     }
 
     public void updateViewTime(Date viewTime) {
@@ -55,7 +52,6 @@ public class NewsLogsManager {
         return list;
     }
 
-    @SuppressWarnings("unused")
     public List<NewsLogs> getNewsByUserId(Long userId) {
         return newsLogsDAO.getNewsByUserId(userId);
     }

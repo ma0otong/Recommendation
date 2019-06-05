@@ -6,9 +6,9 @@ package com.personal.recommendation.constants;
 @SuppressWarnings("unused")
 public enum RecommendationEnum {
 
-    CF(0,"协同过滤"),
-    CB(1,"基于内容"),
-    HR(2,"基于热点");
+    CF(0,"协同过滤推荐"),
+    CB(1,"基于内容推荐"),
+    HR(2,"基于热点推荐");
 
     private int code;
     private String desc;

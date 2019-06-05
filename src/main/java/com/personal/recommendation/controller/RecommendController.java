@@ -4,13 +4,7 @@ import com.personal.recommendation.model.BaseRsp;
 import com.personal.recommendation.service.CalculatorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("recommend")
@@ -22,12 +16,10 @@ public class RecommendController {
         this.calculatorService = calculatorService;
     }
 
-    @GetMapping(value = "test")
+    @GetMapping(value = "/test/{userId}")
     @ResponseBody
-    public BaseRsp runTestData(@RequestParam("uid") Long uid, @RequestParam("type") int type) {
-        List<Long> idList = new ArrayList<>();
-        idList.add(uid);
-        return calculatorService.executeInstantJob(idList, type);
+    public BaseRsp runTestData(@PathVariable("userId") Long userId) {
+        return calculatorService.executeInstantJob(userId);
     }
 
 }

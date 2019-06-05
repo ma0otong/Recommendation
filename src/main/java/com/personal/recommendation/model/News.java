@@ -14,6 +14,7 @@ public class News {
     private int moduleId;
     private String url;
     private String title;
+    private int algorithmType;
 
     public Long getId() {
         return id;
@@ -65,7 +66,14 @@ public class News {
 
     @Override
     public String toString(){
-        return "title:" + title + "," + "url:" + url;
+        return "title:" + title + ", url:" + url + ", algorithmType:" + algorithmType;
     }
 
+    public int getAlgorithmType() {
+        return algorithmType;
+    }
+
+    public void setAlgorithmType(int algorithmType) {
+        this.algorithmType = algorithmType;
+    }
 }

@@ -14,6 +14,7 @@ import java.util.List;
  * 推荐Manager
  */
 @Service
+@SuppressWarnings("unused")
 public class RecommendationsManager {
 
     private final RecommendationsDAO recommendationsDAO;
@@ -27,7 +28,7 @@ public class RecommendationsManager {
         return recommendationsDAO.getNewsIdByUserId(userId);
     }
 
-    @SuppressWarnings("unused")
+
     public List<Long> getNewsIdByUserDeriveTime(long userId) {
         return recommendationsDAO.getNewsIdByUserDeriveTime(userId,
                 DateUtil.getDateBeforeDays(RecommendationConstants.HOT_DATA_DAYS));

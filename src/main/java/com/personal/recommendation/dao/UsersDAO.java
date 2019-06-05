@@ -26,6 +26,9 @@ public interface UsersDAO {
     @Select("select id from " + TABLE)
     List<Long> getAllUserIds();
 
+    @Select("select * from " + TABLE)
+    List<Users> getAllUsers();
+
     @Update("update " + TABLE + " set pref_list = #{newPrefStr} where id = #{userId}")
     void updatePrefListById(@Param("userId") long userId, @Param("newPrefStr") String newPrefStr);
 
