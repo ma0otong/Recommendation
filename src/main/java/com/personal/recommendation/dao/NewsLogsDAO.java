@@ -19,8 +19,8 @@ public interface NewsLogsDAO {
     String TABLE = "news_logs";
 
     @Select("select news_id,count(*) as visitNums from "
-            + TABLE + " where view_time > #{hotDateTime} group by news_id order by visitNums desc")
-    List<NewsLogs> getHotNews(@Param("hotDateTime") Date hotDateTime);
+            + TABLE + " where view_time > #{hotDateTime} group by news_id order by visitNums desc limit #{limit}")
+    List<NewsLogs> getHotNews(@Param("hotDateTime") Date hotDateTime, @Param("limit") int limit);
 
     @Select("select news_id from " + TABLE + " where user_id = #{userId}")
     List<Long> getNewsIdByUserId(@Param("userId") long userId);
@@ -39,7 +39,17 @@ public interface NewsLogsDAO {
     @Select("select * from " + TABLE + " where user_id = #{userId}")
     List<NewsLogs> getNewsByUserId(@Param("userId") Long userId);
 
-    @Insert("insert into " + TABLE + " set user_id = #{userId},news_id = #{newsId}")
+    @Select({
+            "<script>",
+            "select * from " + TABLE + " where id in",
+            "<foreach collection='userIds' item='id' open='(' separator=',' close=')'>",
+            "#{id}",
+            "</foreach>",
+            "</script>"
+    })
+    List<NewsLogs> getNewsByUserIds(@Param("userIds") List<Long> userIds);
+
+    @Insert("insert into " + TABLE + " set user_id = #{userId},news_id = #{newsId},news_module = #{newsModule}")
     void insertNewsLogs(NewsLogs newsLog);
 
 }

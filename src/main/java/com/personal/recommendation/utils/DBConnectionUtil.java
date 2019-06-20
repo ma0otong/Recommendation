@@ -48,6 +48,7 @@ public class DBConnectionUtil {
     }
 
     public MySQLBooleanPrefJDBCDataModel getMySQLJDBCDataModel() {
+        // 构造MySQL偏好表
         return new MySQLBooleanPrefJDBCDataModel(getDataSource(), RecommendationConstants.PREF_TABLE,
                 RecommendationConstants.PREF_TABLE_USER_ID, RecommendationConstants.PREF_TABLE_NEWS_ID,
                 RecommendationConstants.PREF_TABLE_TIME);

@@ -1,13 +1,8 @@
 package com.personal.recommendation.utils;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
-/**
- * 自定义HashMap
- * @param <K>
- * @param <V>
- */
-public class CustomizedHashMap<K, V> extends HashMap<K, V> {
+public class CustomizedHashMap<K, V> extends LinkedHashMap<K, V> {
     private static final long serialVersionUID = 1L;
 
     @Override

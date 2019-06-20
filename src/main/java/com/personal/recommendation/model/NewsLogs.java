@@ -12,7 +12,7 @@ public class NewsLogs {
     private Long userId;
     private Long newsId;
     private Date viewTime;
-    private Integer preferDegree;
+    private String newsModule;
 
     public Long getId() {
         return id;
@@ -46,11 +46,11 @@ public class NewsLogs {
         this.viewTime = viewTime;
     }
 
-    public Integer getPreferDegree() {
-        return preferDegree;
+    public String getNewsModule() {
+        return newsModule;
     }
 
-    public void setPreferDegree(Integer preferDegree) {
-        this.preferDegree = preferDegree;
+    public void setNewsModule(String newsModule) {
+        this.newsModule = newsModule;
     }
 }

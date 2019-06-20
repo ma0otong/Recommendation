@@ -24,17 +24,17 @@ public class RecommendationsManager {
         this.recommendationsDAO = recommendationsDAO;
     }
 
-    public List<Long> getNewsIdByUserId(long userId){
+    public List<Long> getNewsIdByUserId(Long userId){
         return recommendationsDAO.getNewsIdByUserId(userId);
     }
 
 
-    public List<Long> getNewsIdByUserDeriveTime(long userId) {
+    public List<Long> getNewsIdByUserDeriveTime(Long userId) {
         return recommendationsDAO.getNewsIdByUserDeriveTime(userId,
                 DateUtil.getDateBeforeDays(RecommendationConstants.HOT_DATA_DAYS));
     }
 
-    public int getUserRecNumByDeriveTime(long userId, Date deriveTime) {
+    public int getUserRecNumByDeriveTime(Long userId, Date deriveTime) {
         int result = 0;
         try {
             result = recommendationsDAO.getUserRecNumByDeriveTime(userId, deriveTime);

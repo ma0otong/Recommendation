@@ -5,7 +5,6 @@ import com.personal.recommendation.model.News;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -27,14 +26,7 @@ public class NewsManager  {
     }
 
     public List<News> getNewsByIds(List<Long> newsIds){
-        List<News> list = new ArrayList<>();
-        for(Long id : newsIds){
-            News news = newsDAO.getNewsById(id);
-            if(news != null){
-                list.add(news);
-            }
-        }
-        return list;
+        return newsDAO.getNewsByIds(newsIds);
     }
 
     public List<News> getNewsByDateTime(Date dateTime){
@@ -45,11 +37,16 @@ public class NewsManager  {
         newsDAO.updateNewsTime(newsTime);
     }
 
-    public Long getRandomNewsByModule(Long moduleId){
-        return newsDAO.getRandomNewsByModule(moduleId);
+    public int getModuleLevelCount(){
+        return newsDAO.getModuleLevelCount();
     }
 
-    public int getModuleIdCount(){
-        return newsDAO.getModuleIdCount();
+    public List<String> getModuleLevel(){
+        return newsDAO.getModuleLevel();
     }
+
+    public List<News> getNewsByModuleLimit(String moduleLevel, int limit, Date newsTime){
+        return newsDAO.getNewsByModuleLimit(moduleLevel, limit, newsTime);
+    }
+
 }

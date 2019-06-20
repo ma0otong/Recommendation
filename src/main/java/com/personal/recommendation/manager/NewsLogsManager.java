@@ -5,7 +5,6 @@ import com.personal.recommendation.model.NewsLogs;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -23,8 +22,8 @@ public class NewsLogsManager {
         this.newsLogsDAO = newsLogsDAO;
     }
 
-    public List<NewsLogs> getHotNews(Date hotDateTime) {
-        return newsLogsDAO.getHotNews(hotDateTime);
+    public List<NewsLogs> getHotNews(Date hotDateTime, int limit) {
+        return newsLogsDAO.getHotNews(hotDateTime, limit);
     }
 
     public List<Long> getNewsIdByUserId(Long userId) {
@@ -45,11 +44,7 @@ public class NewsLogsManager {
     }
 
     public List<NewsLogs> getNewsByUsers(List<Long> userIds) {
-        List<NewsLogs> list = new ArrayList<>();
-        for (Long userId : userIds) {
-            list.addAll(newsLogsDAO.getNewsByUserId(userId));
-        }
-        return list;
+        return newsLogsDAO.getNewsByUserIds(userIds);
     }
 
     public List<NewsLogs> getNewsByUserId(Long userId) {

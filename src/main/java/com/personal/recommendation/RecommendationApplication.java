@@ -1,21 +1,38 @@
 package com.personal.recommendation;
 
-import com.personal.recommendation.utils.DBConnectionUtil;
+import com.personal.recommendation.component.Initialize;
+import com.personal.recommendation.dao.NewsDAO;
+import com.personal.recommendation.dao.NewsLogsDAO;
+import com.personal.recommendation.model.News;
+import com.personal.recommendation.model.NewsLogs;
+import com.personal.recommendation.utils.SpringContextUtil;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.ApplicationPidFileWriter;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.event.ContextRefreshedEvent;
+
+import java.io.*;
+import java.util.List;
 
 @SpringBootApplication
 @MapperScan("com.personal.recommendation.dao")
-public class RecommendationApplication {
+public class RecommendationApplication implements ApplicationListener<ContextRefreshedEvent> {
 
-	public static void main(String[] args) {
-		ConfigurableApplicationContext ctx = SpringApplication.run(RecommendationApplication.class, args);
-		// 为协同过滤配置提供数据库连接
-		DBConnectionUtil.URL = ctx.getEnvironment().getProperty("spring.datasource.url");
-		DBConnectionUtil.USERNAME = ctx.getEnvironment().getProperty("spring.datasource.username");
-		DBConnectionUtil.PASSWORD = ctx.getEnvironment().getProperty("spring.datasource.password");
-	}
+    public static void main(String[] args) {
+        SpringApplication application = new SpringApplication(RecommendationApplication.class);
+        application.addListeners(new ApplicationPidFileWriter());
+        application.run(args);
+    }
+
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
+        ApplicationContext ctx = contextRefreshedEvent.getApplicationContext();
+        SpringContextUtil.setApplicationContext(contextRefreshedEvent.getApplicationContext());
+        Initialize.initialize(ctx);
+    }
 
 }

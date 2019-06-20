@@ -7,7 +7,6 @@ import com.personal.recommendation.utils.JsonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +25,7 @@ public class UsersManager {
         this.usersDAO = usersDAO;
     }
 
-    public List<Users> getAllUsers(){
+    public List<Users> getAllUsers() {
         return usersDAO.getAllUsers();
     }
 
@@ -35,22 +34,15 @@ public class UsersManager {
     }
 
     private List<Users> getUsersByIds(List<Long> userIds) {
-        List<Users> list = new ArrayList<>();
-        for (Long id : userIds) {
-            Users user = usersDAO.getUserById(id);
-            if (user != null) {
-                list.add(user);
-            }
-        }
-        return list;
+        return usersDAO.getUserByIds(userIds);
     }
 
     public void updateUserTimeStamp(Date timestamp) {
         usersDAO.updateTimeStamp(timestamp);
     }
 
-    public HashMap<Long, CustomizedHashMap<Integer, CustomizedHashMap<String, Double>>> getUserPrefListMap(Long userId) {
-        HashMap<Long, CustomizedHashMap<Integer, CustomizedHashMap<String, Double>>> userPrefListMap = new HashMap<>();
+    public HashMap<Long, CustomizedHashMap<String, CustomizedHashMap<String, Double>>> getUserPrefListMap(Long userId) {
+        HashMap<Long, CustomizedHashMap<String, CustomizedHashMap<String, Double>>> userPrefListMap = new HashMap<>();
         try {
             Users user = getUserById(userId);
             userPrefListMap.put(user.getId(), JsonUtil.jsonPrefListToMap(user.getPrefList()));
@@ -64,22 +56,20 @@ public class UsersManager {
         return usersDAO.getAllUserIds();
     }
 
-    public void updatePrefListById(long userId, String newPrefStr) {
-        usersDAO.updatePrefListById(userId, newPrefStr);
+    public void updatePrefAndProfileById(long userId, String newPrefStr, String userProfile) {
+        usersDAO.updatePrefAndProfileById(userId, newPrefStr, userProfile);
     }
 
-    public void initializePrefList(Users user, int moduleCount){
+    public void initializePrefList(Users user, List<String> moduleList) {
         // prefList为空则初始化prefList
-        if (user.getPrefList() == null || user.getPrefList().isEmpty()) {
-            StringBuilder newPrefStr = new StringBuilder("{");
-            for (int i = 1; i <= moduleCount; i++) {
-                newPrefStr.append("\"").append(i).append("\":").append("{}").append(",");
-            }
-            newPrefStr = new StringBuilder(newPrefStr.substring(0, newPrefStr.length() - 1) + "}");
-            // 更新users preference
-            usersDAO.updatePrefListById(user.getId(), newPrefStr.toString());
-            user.setPrefList(newPrefStr.toString());
+        StringBuilder newPrefStr = new StringBuilder("{");
+        for (String moduleName : moduleList) {
+            newPrefStr.append("\"").append(moduleName).append("\":").append("{}").append(",");
         }
+        newPrefStr = new StringBuilder(newPrefStr.substring(0, newPrefStr.length() - 1) + "}");
+        // 更新users preference
+        usersDAO.updatePrefListById(user.getId(), newPrefStr.toString());
+        user.setPrefList(newPrefStr.toString());
     }
 
 }
