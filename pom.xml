@@ -151,6 +151,12 @@
 			<version>portable-1.7.3</version>
 		</dependency>
 
+		<dependency>
+			<groupId>de.bwaldvogel</groupId>
+			<artifactId>liblinear</artifactId>
+			<version>1.95</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>

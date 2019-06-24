@@ -12,7 +12,10 @@ public interface ClassificationConstants {
     String TRAIN_FILE_PATH = "E:\\documents\\多层级分类训练集\\mlc_dataset";
 
     // model文件名
-    String MODEL_JAR_NAME = "classification-model.ser";
+    // String MODEL_JAR_NAME = "classification-model.ser";
+
+    // model文件名
+    String SVM_MODEL_JAR_NAME = "svm-classification-model.ser";
 
     // 文件位置分割符
     String SPLIT = "\\";

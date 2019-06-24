@@ -5,9 +5,9 @@ import com.hankcs.hanlp.classification.models.NaiveBayesModel;
 import com.hankcs.hanlp.classification.utilities.io.ConsoleLogger;
 import com.hankcs.hanlp.collection.trie.bintrie.BinTrie;
 import com.hankcs.hanlp.utility.MathUtility;
+import com.personal.recommendation.component.hanLP.model.MyBaseFeatureData;
 import com.personal.recommendation.component.hanLP.model.MyDocument;
 import com.personal.recommendation.component.hanLP.service.MyIDataSet;
-import com.personal.recommendation.component.hanLP.utils.MyBaseFeatureData;
 import com.personal.recommendation.component.hanLP.utils.MyChiSquareFeatureExtractor;
 
 import java.util.Iterator;

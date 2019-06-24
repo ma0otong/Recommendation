@@ -118,6 +118,7 @@ public abstract class MyAbstractDataSet implements MyIDataSet {
                                     getFileList(files[i], fileList);
                                     for(File file : fileList){
                                         try {
+                                            // 加入训练集
                                             this.add(folder.getName(), TextProcessUtility.readTxt(file, charsetName));
                                         } catch (Exception e2) {
                                             e2.printStackTrace();

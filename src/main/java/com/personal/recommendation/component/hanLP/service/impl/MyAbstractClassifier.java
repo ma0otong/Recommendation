@@ -9,15 +9,14 @@ import com.personal.recommendation.component.hanLP.service.MyIClassifier;
 import com.personal.recommendation.component.hanLP.service.MyIDataSet;
 
 import java.io.IOException;
-import java.util.*;
-import java.util.Map.Entry;
+import java.util.Map;
+import java.util.TreeMap;
 
-/**
- * 自定义MyIClassifier实现类
- */
-@SuppressWarnings({"unchecked","unused"})
-public abstract class MyClassifierImplement implements MyIClassifier {
-    boolean configProbabilityEnabled = true;
+@SuppressWarnings("unused")
+public abstract class MyAbstractClassifier implements MyIClassifier {
+
+    MyAbstractClassifier() {
+    }
 
     public MyIClassifier enableProbability(boolean enable) {
         return this;
@@ -27,7 +26,6 @@ public abstract class MyClassifierImplement implements MyIClassifier {
         Map<String, Double> scoreMap = this.predict(text);
         return CollectionUtility.max(scoreMap);
     }
-
 
     public String classify(MyDocument document) throws IllegalArgumentException, IllegalStateException {
         Map<String, Double> scoreMap = this.predict(document);
@@ -46,11 +44,10 @@ public abstract class MyClassifierImplement implements MyIClassifier {
         int total = trainingDataSet.size();
         int cur = 0;
 
-        for (Entry<String, String[]> stringEntry : trainingDataSet.entrySet()) {
-            String category = (String) ((Entry) stringEntry).getKey();
+        for (Map.Entry<String, String[]> stringEntry : trainingDataSet.entrySet()) {
+            String category = (String) ((Map.Entry) stringEntry).getKey();
             ConsoleLogger.logger.out("[%s]...", category);
-            String[] var8 = (String[]) ((Entry) stringEntry).getValue();
-            int var9 = var8.length;
+            String[] var8 = (String[]) ((Map.Entry) stringEntry).getValue();
 
             for (String doc : var8) {
                 dataSet.add(category, doc);
@@ -68,21 +65,21 @@ public abstract class MyClassifierImplement implements MyIClassifier {
         this.train(folderPath, "UTF-8");
     }
 
-    public Map<String, Double> predict(MyDocument myDocument) {
-        AbstractModel myModel = this.getModel();
-        if (myModel == null) {
+    public Map<String, Double> predict(MyDocument document) {
+        AbstractModel model = this.getModel();
+        if (model == null) {
             throw new IllegalStateException("未训练模型！无法执行预测！");
-        } else if (myDocument == null) {
+        } else if (document == null) {
             throw new IllegalArgumentException("参数 text == null");
         } else {
-            double[] pros = this.categorize(myDocument);
-            Map<String, Double> myScoreMap = new TreeMap();
+            double[] probs = this.categorize(document);
+            Map<String, Double> scoreMap = new TreeMap();
 
-            for(int i = 0; i < pros.length; ++i) {
-                myScoreMap.put(myModel.catalog[i], pros[i]);
+            for(int i = 0; i < probs.length; ++i) {
+                scoreMap.put(model.catalog[i], probs[i]);
             }
 
-            return myScoreMap;
+            return scoreMap;
         }
     }
 
@@ -93,13 +90,13 @@ public abstract class MyClassifierImplement implements MyIClassifier {
         } else if (document == null) {
             throw new IllegalArgumentException("参数 text == null");
         } else {
-            double[] pros = this.categorize(document);
-            double max = -1.0D;
+            double[] prob = this.categorize(document);
+            double max = -1.0D / 0.0;
             int best = -1;
 
-            for(int i = 0; i < pros.length; ++i) {
-                if (pros[i] > max) {
-                    max = pros[i];
+            for(int i = 0; i < prob.length; ++i) {
+                if (prob[i] > max) {
+                    max = prob[i];
                     best = i;
                 }
             }

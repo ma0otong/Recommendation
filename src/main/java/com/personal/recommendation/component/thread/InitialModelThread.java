@@ -1,7 +1,7 @@
 package com.personal.recommendation.component.thread;
 
-import com.hankcs.hanlp.classification.models.NaiveBayesModel;
 import com.hankcs.hanlp.corpus.io.IOUtil;
+import com.personal.recommendation.component.hanLP.model.MyLinearSVMModel;
 import com.personal.recommendation.constants.ClassificationConstants;
 import com.personal.recommendation.service.classification.ClassificationService;
 import org.apache.log4j.Logger;
@@ -19,9 +19,9 @@ public class InitialModelThread implements Runnable {
         File[] files = modelDir.listFiles();
         assert files != null;
         for(File f : files){
-            NaiveBayesModel model = (NaiveBayesModel) IOUtil.readObjectFrom(f.getPath());
+            MyLinearSVMModel model = (MyLinearSVMModel) IOUtil.readObjectFrom(f.getPath());
             if(model != null) {
-                ClassificationService.modelMap.put(f.getPath(), model);
+                ClassificationService.svmModelMap.put(f.getPath(), model);
                 logger.info(f.getPath() + " initialized .");
             }
         }

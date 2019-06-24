@@ -37,8 +37,6 @@ public class RecommendServiceThread implements Runnable{
                 Long userId = CalculatorService.requestQueue.poll();
                 if (userId != null) {
                     long start = new Date().getTime();
-                    logger.info("Recommendation calculation start at " + start + ", userId : " + userId);
-
                     Users user = usersManager.getUserById(userId);
                     // 用户不存在
                     if (user != null) {

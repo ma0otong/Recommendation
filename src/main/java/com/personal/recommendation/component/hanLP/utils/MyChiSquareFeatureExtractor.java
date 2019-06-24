@@ -2,6 +2,7 @@ package com.personal.recommendation.component.hanLP.utils;
 
 import com.hankcs.hanlp.algorithm.MaxHeap;
 import com.hankcs.hanlp.classification.statistics.ContinuousDistributions;
+import com.personal.recommendation.component.hanLP.model.MyBaseFeatureData;
 import com.personal.recommendation.component.hanLP.service.MyIDataSet;
 
 import java.util.Comparator;
@@ -40,6 +41,7 @@ public class MyChiSquareFeatureExtractor {
                 double N01 = (double)stats.categoryCounts[category] - N11;
                 double N00 = N0dot - N01;
                 double N10 = N1dot - N11;
+                // 计算卡方
                 double chisquareScore = (double)stats.n * Math.pow(N11 * N00 - N10 * N01, 2.0D) / ((N11 + N01) * (N11 + N10) * (N10 + N00) * (N01 + N00));
                 if (chisquareScore >= this.chisquareCriticalValue) {
                     Double previousScore = (Double)selectedFeatures.get(feature);
