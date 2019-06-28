@@ -24,6 +24,10 @@ public class RecommendationsManager {
         this.recommendationsDAO = recommendationsDAO;
     }
 
+    public List<Recommendations> getNewsByUserId(Long userId, int limit){
+        return recommendationsDAO.getNewsByUserId(userId, limit);
+    }
+
     public List<Long> getNewsIdByUserId(Long userId){
         return recommendationsDAO.getNewsIdByUserId(userId);
     }
@@ -46,6 +50,14 @@ public class RecommendationsManager {
 
     public void insertRecommendations(Recommendations recommendation){
         recommendationsDAO.insertRecommendation(recommendation);
+    }
+
+    public Recommendations getRecommendationByUserAndNewsId(Long userId, Long newsId){
+        return recommendationsDAO.getRecommendationByUserAndNewsId(userId, newsId);
+    }
+
+    public void updateFeedBackById(Long id, int feedback){
+        recommendationsDAO.updateFeedBackById(id, feedback);
     }
 
 }

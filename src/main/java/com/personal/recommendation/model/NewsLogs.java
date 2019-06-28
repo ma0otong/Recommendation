@@ -13,6 +13,7 @@ public class NewsLogs {
     private Long newsId;
     private Date viewTime;
     private String newsModule;
+    private int visitNum;
 
     public Long getId() {
         return id;
@@ -52,5 +53,13 @@ public class NewsLogs {
 
     public void setNewsModule(String newsModule) {
         this.newsModule = newsModule;
+    }
+
+    public int getVisitNum() {
+        return visitNum;
+    }
+
+    public void setVisitNum(int visitNum) {
+        this.visitNum = visitNum;
     }
 }

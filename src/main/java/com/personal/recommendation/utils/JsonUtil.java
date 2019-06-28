@@ -4,7 +4,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 
 import java.io.IOException;
-import java.util.LinkedHashMap;
 
 /**
  * Json处理工具类

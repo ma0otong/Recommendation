@@ -12,7 +12,6 @@ import java.util.List;
  * 新闻日志Manager
  */
 @Service
-@SuppressWarnings("unused")
 public class NewsLogsManager {
 
     private final NewsLogsDAO newsLogsDAO;
@@ -30,29 +29,20 @@ public class NewsLogsManager {
         return newsLogsDAO.getNewsIdByUserId(userId);
     }
 
-
-    public List<NewsLogs> getAll() {
-        return newsLogsDAO.getAll();
-    }
-
     public List<NewsLogs> getNewsLogsByUserViewTime(Date viewTime, Long userId, int recordNum) {
         return newsLogsDAO.getNewsLogsByUserViewTime(viewTime, userId, recordNum);
     }
 
-    public void updateViewTime(Date viewTime) {
-        newsLogsDAO.updateViewTime(viewTime);
-    }
-
-    public List<NewsLogs> getNewsByUsers(List<Long> userIds) {
-        return newsLogsDAO.getNewsByUserIds(userIds);
-    }
-
-    public List<NewsLogs> getNewsByUserId(Long userId) {
-        return newsLogsDAO.getNewsByUserId(userId);
+    public void updateViewTimeById(Date viewTime, Long id) {
+        newsLogsDAO.updateViewTime(viewTime, id);
     }
 
     public void insertNewsLogs(NewsLogs newsLog){
         newsLogsDAO.insertNewsLogs(newsLog);
+    }
+
+    public NewsLogs getUserLogByUserId(Long userId, Long newsId){
+        return newsLogsDAO.getUserLogByUserId(userId, newsId);
     }
 
 }

@@ -16,6 +16,7 @@ public class News {
     private String moduleLevel1;
     private String moduleLevel2;
     private String moduleLevel3;
+    private String algorithm;
 
     public Long getId() {
         return id;
@@ -81,8 +82,17 @@ public class News {
         this.moduleLevel3 = moduleLevel3;
     }
 
+    public String getAlgorithm() {
+        return algorithm;
+    }
+
+    public void setAlgorithm(String algorithm) {
+        this.algorithm = algorithm;
+    }
+
     @Override
     public String toString(){
         return id + ":" + moduleLevel1 + ":" + content;
     }
+
 }

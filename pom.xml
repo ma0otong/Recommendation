@@ -139,22 +139,10 @@
 			<version>1.8.12</version>
 		</dependency>
 
+		<!-- 引入thymeleaf模板引擎-->
 		<dependency>
-			<groupId>redis.clients</groupId>
-			<artifactId>jedis</artifactId>
-			<version>2.9.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.hankcs</groupId>
-			<artifactId>hanlp</artifactId>
-			<version>portable-1.7.3</version>
-		</dependency>
-
-		<dependency>
-			<groupId>de.bwaldvogel</groupId>
-			<artifactId>liblinear</artifactId>
-			<version>1.95</version>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
 		</dependency>
 
 	</dependencies>

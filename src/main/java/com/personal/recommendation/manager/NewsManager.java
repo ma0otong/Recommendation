@@ -29,16 +29,8 @@ public class NewsManager  {
         return newsDAO.getNewsByIds(newsIds);
     }
 
-    public List<News> getNewsByDateTime(Date dateTime){
-        return newsDAO.getNewsByDateTime(dateTime);
-    }
-
-    public void updateNewsTime(Date newsTime){
-        newsDAO.updateNewsTime(newsTime);
-    }
-
-    public int getModuleLevelCount(){
-        return newsDAO.getModuleLevelCount();
+    public List<News> getNewsByLimitOffset(int limit, int offset){
+        return newsDAO.getNewsByLimitOffset(limit, offset);
     }
 
     public List<String> getModuleLevel(){
@@ -48,5 +40,14 @@ public class NewsManager  {
     public List<News> getNewsByModuleLimit(String moduleLevel, int limit, Date newsTime){
         return newsDAO.getNewsByModuleLimit(moduleLevel, limit, newsTime);
     }
+
+    public Long getMinId(){
+        return newsDAO.getMinId();
+    }
+
+    public Long getMaxId(){
+        return newsDAO.getMaxId();
+    }
+
 
 }

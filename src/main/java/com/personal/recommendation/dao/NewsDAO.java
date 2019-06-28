@@ -14,7 +14,6 @@ import java.util.List;
  * news表DAO
  */
 @Service
-@SuppressWarnings("unused")
 public interface NewsDAO {
 
     String TABLE = "news";
@@ -32,30 +31,24 @@ public interface NewsDAO {
     })
     List<News> getNewsByIds(@Param("newsIds") List<Long> newsIds);
 
-    @Select("select * from " + TABLE + " where news_time > #{dateTime}")
-    List<News> getNewsByDateTime(@Param("dateTime") Date dateTime);
-
-    @Update("update " + TABLE + " set news_time = #{newsTime}")
-    void updateNewsTime(@Param("newsTime") Date newsTime);
-
     @Insert("insert into " + TABLE + " set id = #{id},content = #{content}," +
             "title = #{title},url = #{url},module_level_1=#{moduleLevel1}," +
             "module_level_2=#{moduleLevel2},module_level_3=#{moduleLevel3}")
     void insertNews(News news);
 
-    @Select("select count(distinct(module_level_1)) from " + TABLE)
-    int getModuleLevelCount();
-
     @Select("select distinct(module_level_1) from " + TABLE)
     List<String> getModuleLevel();
 
-    @Select("select count(*) from " + TABLE)
-    int getNewsCount();
-
-    @Select("select * from " + TABLE + " limit #{limit} offset #{offset}")
+    @Select("select * from " + TABLE + " where limit #{limit} offset #{offset}")
     List<News> getNewsByLimitOffset(@Param("limit") int limit, @Param("offset") int offset);
 
     @Select("select * from " + TABLE + " where module_level_1 = #{moduleLevel} and news_time > #{newsTime} limit #{limit}")
     List<News> getNewsByModuleLimit(@Param("moduleLevel") String moduleLevel, @Param("limit") int limit, @Param("newsTime") Date newsTime);
+
+    @Select("select min(id) from " + TABLE)
+    Long getMinId();
+
+    @Select("select max(id) from " + TABLE)
+    Long getMaxId();
 
 }

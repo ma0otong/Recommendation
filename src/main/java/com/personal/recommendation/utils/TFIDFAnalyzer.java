@@ -20,6 +20,7 @@ public class TFIDFAnalyzer {
      */
     @SuppressWarnings("unchecked")
     public static List<Keyword> getTfIdf(String content) {
+        content = StringUtil.getContent(content);
         return keywordComputer.computeArticleTfidf(content);
     }
 

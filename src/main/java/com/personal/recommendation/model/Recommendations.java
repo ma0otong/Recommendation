@@ -12,8 +12,8 @@ public class Recommendations {
     private Long userId;
     private Long newsId;
     private Date deriveTime;
-    private Boolean feedback;
-    private Integer deriveAlgorithm;
+    private int feedback;
+    private String deriveAlgorithm;
 
     public Long getId() {
         return id;
@@ -47,19 +47,19 @@ public class Recommendations {
         this.deriveTime = deriveTime;
     }
 
-    public Boolean getFeedback() {
+    public int getFeedback() {
         return feedback;
     }
 
-    public void setFeedback(Boolean feedback) {
+    public void setFeedback(int feedback) {
         this.feedback = feedback;
     }
 
-    public Integer getDeriveAlgorithm() {
+    public String getDeriveAlgorithm() {
         return deriveAlgorithm;
     }
 
-    public void setDeriveAlgorithm(Integer deriveAlgorithm) {
+    public void setDeriveAlgorithm(String deriveAlgorithm) {
         this.deriveAlgorithm = deriveAlgorithm;
     }
 
