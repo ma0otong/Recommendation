@@ -24,8 +24,12 @@ public class RecommendationsManager {
         this.recommendationsDAO = recommendationsDAO;
     }
 
-    public List<Recommendations> getNewsByUserId(Long userId, int limit){
-        return recommendationsDAO.getNewsByUserId(userId, limit);
+    public List<Recommendations> getNewsByUserId(Long userId){
+        return recommendationsDAO.getNewsByUserId(userId);
+    }
+
+    public List<Recommendations> getNewsByUserIdType(Long userId, int limit, String type){
+        return recommendationsDAO.getNewsByUserIdType(userId, limit, type);
     }
 
     public List<Long> getNewsIdByUserId(Long userId){

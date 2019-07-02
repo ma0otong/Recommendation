@@ -2,7 +2,6 @@ package com.personal.recommendation.utils;
 
 import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
 import com.jfinal.plugin.c3p0.C3p0Plugin;
-import com.personal.recommendation.constants.RecommendationConstants;
 import org.apache.log4j.Logger;
 import org.apache.mahout.cf.taste.impl.model.jdbc.MySQLBooleanPrefJDBCDataModel;
 
@@ -49,8 +48,16 @@ public class DBConnectionUtil {
 
     public MySQLBooleanPrefJDBCDataModel getMySQLJDBCDataModel() {
         // 构造MySQL偏好表
-        return new MySQLBooleanPrefJDBCDataModel(getDataSource(), RecommendationConstants.PREF_TABLE,
-                RecommendationConstants.PREF_TABLE_USER_ID, RecommendationConstants.PREF_TABLE_NEWS_ID,
-                RecommendationConstants.PREF_TABLE_TIME);
+        // 用户浏览时间列名
+        String PREF_TABLE_TIME = "view_time";
+        // 浏览记录表明
+        String PREF_TABLE = "news_logs";
+        // 新闻id列名
+        String PREF_TABLE_NEWS_ID = "news_id";
+        // 用户id列名
+        String PREF_TABLE_USER_ID = "user_id";
+
+        return new MySQLBooleanPrefJDBCDataModel(getDataSource(), PREF_TABLE, PREF_TABLE_USER_ID, PREF_TABLE_NEWS_ID,
+                PREF_TABLE_TIME);
     }
 }

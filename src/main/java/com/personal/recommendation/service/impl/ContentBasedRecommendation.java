@@ -13,7 +13,6 @@ import com.personal.recommendation.service.RecommendationAlgorithmService;
 import com.personal.recommendation.service.RecommendationCalculator;
 import com.personal.recommendation.utils.*;
 import org.ansj.app.keyword.Keyword;
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,8 +25,6 @@ import java.util.stream.Collectors;
  */
 @Service
 public class ContentBasedRecommendation implements RecommendationAlgorithmService {
-
-    private static final Logger logger = Logger.getLogger(ContentBasedRecommendation.class);
 
     private final UsersManager usersManager;
     private final NewsManager newsManager;
@@ -48,10 +45,7 @@ public class ContentBasedRecommendation implements RecommendationAlgorithmServic
 
     @Override
     public Set<Long> recommend(Users user, int recNum, List<Long> recommendedNews, List<Long> browsedNews) {
-        long start = new Date().getTime();
         Long userId = user.getId();
-        logger.info(RecommendationEnum.CB.getDesc() + " start at " + start + ", userId : " + userId);
-        logger.info("Recommended data not enough, " + RecommendationEnum.CB.getDesc() + " need fetch " + recNum);
 
         // prefList衰减更新
         userPrefDecRefresh(user);
@@ -106,10 +100,6 @@ public class ContentBasedRecommendation implements RecommendationAlgorithmServic
 
             }
 
-            long end = new Date().getTime();
-            if (!toBeRecommended.isEmpty())
-                logger.info("CB has contributed " + toBeRecommended.size() + " recommending news on average");
-            logger.info("CB finished at " + end + ", time cost : " + (double) ((end - start) / 1000) + "s .");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -125,9 +115,6 @@ public class ContentBasedRecommendation implements RecommendationAlgorithmServic
      */
     @SuppressWarnings("unchecked")
     private void userPrefRefresh(Users user) {
-        long start = new Date().getTime();
-        logger.info("Start refreshing prefList at " + start);
-
         Long userId = user.getId();
         // 用户浏览新闻纪录：userBrowsedMap:<Long(userId),ArrayList<String>(newsId List)>
         List<NewsLogs> newsLogsList = newsLogsManager.getNewsLogsByUserViewTime(
@@ -177,8 +164,6 @@ public class ContentBasedRecommendation implements RecommendationAlgorithmServic
         } catch (Exception e) {
             e.printStackTrace();
         }
-        long end = new Date().getTime();
-        logger.info("Refresh finished at " + end + ", time cost : " + (double) ((end - start) / 1000) + "s .");
     }
 
     /**
@@ -186,9 +171,6 @@ public class ContentBasedRecommendation implements RecommendationAlgorithmServic
      * @param user Users
      */
     private void userPrefDecRefresh(Users user) {
-        long start = new Date().getTime();
-        logger.info("Start prefList reduction at " + start);
-
         try {
             // prefList为空则初始化prefList
             if (user.getPrefList() == null || user.getPrefList().isEmpty()) {
@@ -228,8 +210,6 @@ public class ContentBasedRecommendation implements RecommendationAlgorithmServic
         } catch (Exception e) {
             e.printStackTrace();
         }
-        long end = new Date().getTime();
-        logger.info("PrefList reduction finished at " + end + ", time cost : " + (double) ((end - start) / 1000) + "s .");
     }
 
     /**

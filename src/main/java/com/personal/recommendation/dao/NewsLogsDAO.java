@@ -30,6 +30,9 @@ public interface NewsLogsDAO {
     List<NewsLogs> getNewsLogsByUserViewTime(@Param("viewTime") Date viewTime,
                                              @Param("userId") Long userId, @Param("recordNum") int recordNum);
 
+    @Select("select news_id from " + TABLE + " where user_id = #{userId}")
+    List<Long> getNewsIdsByUser(@Param("userId") Long userId);
+
     @Update("update " + TABLE + " set view_time = #{viewTime} where id = #{id}")
     void updateViewTime(@Param("viewTime") Date viewTime, @Param("id") Long id);
 

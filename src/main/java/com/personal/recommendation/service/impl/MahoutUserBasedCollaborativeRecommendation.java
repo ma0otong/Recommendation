@@ -9,8 +9,6 @@ import com.personal.recommendation.service.RecommendationAlgorithmFactory;
 import com.personal.recommendation.service.RecommendationAlgorithmService;
 import com.personal.recommendation.service.RecommendationCalculator;
 import com.personal.recommendation.utils.DBConnectionUtil;
-import org.apache.log4j.Logger;
-import org.apache.mahout.cf.taste.common.TasteException;
 import org.apache.mahout.cf.taste.impl.model.jdbc.MySQLBooleanPrefJDBCDataModel;
 import org.apache.mahout.cf.taste.impl.neighborhood.NearestNUserNeighborhood;
 import org.apache.mahout.cf.taste.impl.similarity.LogLikelihoodSimilarity;
@@ -28,8 +26,6 @@ import java.util.*;
 @Service
 public class MahoutUserBasedCollaborativeRecommendation implements RecommendationAlgorithmService {
 
-    private static final Logger logger = Logger.getLogger(MahoutUserBasedCollaborativeRecommendation.class);
-
     @PostConstruct
     void init() {
         RecommendationAlgorithmFactory.addHandler(RecommendationEnum.CF.getCode(), this);
@@ -40,16 +36,12 @@ public class MahoutUserBasedCollaborativeRecommendation implements Recommendatio
      */
     @Override
     public Set<Long> recommend(Users user, int recNum, List<Long> recommendedNews, List<Long> browsedNews) {
-        long start = new Date().getTime();
         Long userId = user.getId();
-        logger.info(RecommendationEnum.CF.getDesc() + " start at " + start + ", userId : " + userId);
-        logger.info("Recommended data not enough, " + RecommendationEnum.CF.getDesc() + " need fetch " + recNum);
 
         // 保存推荐结果
         Set<Long> toBeRecommended = new HashSet<>();
 
         try {
-            logger.info("CF start at " + new Date());
 
             MySQLBooleanPrefJDBCDataModel dataModel = new DBConnectionUtil().getMySQLJDBCDataModel();
 
@@ -64,26 +56,14 @@ public class MahoutUserBasedCollaborativeRecommendation implements Recommendatio
 
             for (RecommendedItem recItem : recItems) {
                 toBeRecommended.add(recItem.getItemID());
-                logger.info("CF found similar user, id : " + recItem.getItemID() + ", value : " + recItem.getValue());
             }
 
             toBeRecommended = RecommendationCalculator.resultHandle(recommendedNews, browsedNews, toBeRecommended,
                     userId, RecommendationEnum.CF.getDesc(), recNum, false);
 
-        } catch (TasteException e) {
-            logger.error("CF算法构造偏好对象失败！");
-            e.printStackTrace();
-
         } catch (Exception e) {
-            logger.error("CF算法数据库操作失败！");
             e.printStackTrace();
-
         }
-
-        long end = new Date().getTime();
-        if(!toBeRecommended.isEmpty())
-            logger.info("CF has contributed " + toBeRecommended.size() + " recommending news on average");
-        logger.info("CF finished at " + end + ", time cost : " + (double) ((end - start) / 1000) + "s .");
 
         return toBeRecommended;
 

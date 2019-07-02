@@ -12,7 +12,6 @@ import com.personal.recommendation.service.RecommendationCalculator;
 import com.personal.recommendation.service.RecommendationAlgorithmFactory;
 import com.personal.recommendation.utils.DateUtil;
 import com.personal.recommendation.utils.SpringContextUtil;
-import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -24,8 +23,6 @@ import java.util.*;
 @Service
 public class HotDataRecommendation implements RecommendationAlgorithmService {
 
-    private static final Logger logger = Logger.getLogger(HotDataRecommendation.class);
-
     // 将每天生成的“热点新闻”ID，按照新闻的热点程度从高到低放入此List
     public static ArrayList<Long> topHotNewsList = new ArrayList<>();
 
@@ -36,10 +33,7 @@ public class HotDataRecommendation implements RecommendationAlgorithmService {
 
     @Override
     public Set<Long> recommend(Users user, int recNum, List<Long> recommendedNews, List<Long> browsedNews) {
-        long start = new Date().getTime();
         Long userId = user.getId();
-        logger.info(RecommendationEnum.HR.getDesc() + " start at " + start + ", userId : " + userId);
-        logger.info("Recommended data not enough, " + RecommendationEnum.HR.getDesc() + " need fetch " + recNum);
 
         // 保存推荐结果
         Set<Long> toBeRecommended = new HashSet<>();
@@ -57,11 +51,6 @@ public class HotDataRecommendation implements RecommendationAlgorithmService {
             e.printStackTrace();
         }
 
-        long end = new Date().getTime();
-        if (!toBeRecommended.isEmpty())
-            logger.info("HR has contributed " + toBeRecommended.size() + " recommending news on average");
-        logger.info("HR finished at " + end + ", time cost : " + (double) ((end - start) / 1000) + "s .");
-
         return toBeRecommended;
 
     }
@@ -70,9 +59,8 @@ public class HotDataRecommendation implements RecommendationAlgorithmService {
      * 加载热点新闻
      */
     public static void formTopHotNewsList() {
-        long start = new Date().getTime();
-        logger.info("Start initializing hot list .");
         try {
+            topHotNewsList.clear();
             NewsLogsManager newsLogsManager = (NewsLogsManager) SpringContextUtil.getBean("newsLogsManager");
             List<NewsLogs> hotNewsLogs = newsLogsManager.getHotNews(DateUtil.getDateBeforeDays(
                     RecommendationConstants.HOT_DATA_DAYS), RecommendationConstants.MAX_HOT_NUM);
@@ -86,7 +74,5 @@ public class HotDataRecommendation implements RecommendationAlgorithmService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        long end = new Date().getTime();
-        logger.info("Hot list initialized, list size : " + topHotNewsList.size() + ", time cost : " + (double) ((end - start) / 1000) + "s .");
     }
 }

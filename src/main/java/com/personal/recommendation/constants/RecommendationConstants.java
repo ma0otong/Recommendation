@@ -37,10 +37,7 @@ public interface RecommendationConstants {
     int N = 20;
 
     // CF占比
-    double CF_RATE = 0.5;
-
-    // CB占比
-    double CB_RATE = 0.5;
+    double CF_RATE = 0.2;
 
     // 基于内容最大相关条数
     int CB_MAX_NEWS = 1000;
@@ -53,18 +50,6 @@ public interface RecommendationConstants {
 
     // separator
     String SEPARATOR = ",";
-
-    // 用户id列名
-    String PREF_TABLE_USER_ID = "user_id";
-
-    // 新闻id列名
-    String PREF_TABLE_NEWS_ID = "news_id";
-
-    // 用户浏览时间列名
-    String PREF_TABLE_TIME = "view_time";
-
-    // 浏览记录表明
-    String PREF_TABLE = "news_logs";
 
     // 新闻模块id
     String MODULE_ID_STR = "module_id_str";

@@ -33,6 +33,10 @@ public class NewsLogsManager {
         return newsLogsDAO.getNewsLogsByUserViewTime(viewTime, userId, recordNum);
     }
 
+    public List<Long> getNewsIdsByUser( Long userId) {
+        return newsLogsDAO.getNewsIdsByUser(userId);
+    }
+
     public void updateViewTimeById(Date viewTime, Long id) {
         newsLogsDAO.updateViewTime(viewTime, id);
     }

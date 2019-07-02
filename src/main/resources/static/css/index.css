@@ -79,15 +79,12 @@
 table tr:nth-child(odd) {
     background: lightgray;
 }
-
 table tr:hover {
     background: lightblue;
 }
-
 table td:nth-child(2) {
     color: red;
 }
-
 table td:nth-child(5) {
     color: darkred;
 }

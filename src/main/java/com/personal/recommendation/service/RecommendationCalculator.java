@@ -56,7 +56,6 @@ public class RecommendationCalculator implements Runnable {
             while (true) {
                 Long userId = requestQueue.poll();
                 if (userId != null) {
-                    long start = new Date().getTime();
                     Users user = usersManager.getUserById(userId);
                     // 用户存在
                     if (user != null) {
@@ -86,7 +85,7 @@ public class RecommendationCalculator implements Runnable {
                             cfRecommended = new HashSet<>(toBeRecommended);
                             // 再用基于内容推荐, 若无browsedNews直接跳过
                             neededNum = neededNum - toBeRecommended.size() +
-                                    (int) (RecommendationConstants.CB_RATE * RecommendationConstants.N);
+                                    (int) ((1 - RecommendationConstants.CF_RATE) * RecommendationConstants.N);
                             toBeRecommended.addAll(RecommendationAlgorithmFactory.getHandler(RecommendationEnum.CB.getCode()).recommend(
                                     user, neededNum, recommendedNews, browsedNews));
                             cbRecommended = new HashSet<>(toBeRecommended);
@@ -104,8 +103,6 @@ public class RecommendationCalculator implements Runnable {
                         logger.info(String.format("Total recommended size : %s, fromCF : %s, fromCB : %s, fromHR : %s .",
                                 toBeRecommended.size(), cfRecommended.size(), cbRecommended.size(), hrRecommended.size()));
 
-                        long end = new Date().getTime();
-                        logger.info("Calculation finished at " + end + ", time cost : " + (double) ((end - start) / 1000) + "s .");
                     }
                 } else {
                     try {

@@ -49,7 +49,8 @@
         <th>分类三</th>
         <th>推荐算法</th>
     </tr>
-    <tr style="background: wheat;" th:each="news : ${recommendationList}">
+    <tr style="background: beige;" onMouseOver="this.style.background='lightblue'"
+        onMouseOut="this.style.background='beige'" th:each="news : ${recommendationList}">
         <td th:name="rows" th:id="${news.moduleLevel1}" style="width:60%">
             <a target="_blank" th:href="@{'/test/news/'+${userId}+'/'+${news.id}}" th:text="${news.title}"></a>
         </td>
