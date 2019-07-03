@@ -56,14 +56,9 @@ public class Initialize {
 //        RecommendationConstants.MODULE_STR_MAP.put("news_game", "游戏");
 //        RecommendationConstants.MODULE_STR_MAP.put("news_sports", "体育");
 //        RecommendationConstants.MODULE_STR_MAP.put("news_essay", "美文");
-        RecommendationConstants.MODULE_STR_MAP.put("news_agriculture", "建筑");
-        RecommendationConstants.MODULE_STR_MAP.put("news_astrology", "天文");
+        RecommendationConstants.MODULE_STR_MAP.put("news_astrology", "星座");
         RecommendationConstants.MODULE_STR_MAP.put("news_baby", "育婴");
-        RecommendationConstants.MODULE_STR_MAP.put("news_career", "职业");
-        RecommendationConstants.MODULE_STR_MAP.put("news_collect", "收藏");
-        RecommendationConstants.MODULE_STR_MAP.put("news_comic", "漫画");
         RecommendationConstants.MODULE_STR_MAP.put("news_culture", "文化");
-        RecommendationConstants.MODULE_STR_MAP.put("news_design", "设计");
         RecommendationConstants.MODULE_STR_MAP.put("news_edu", "教育");
         RecommendationConstants.MODULE_STR_MAP.put("news_fashion", "时尚");
         RecommendationConstants.MODULE_STR_MAP.put("news_food", "美食");
@@ -71,14 +66,9 @@ public class Initialize {
         RecommendationConstants.MODULE_STR_MAP.put("news_history", "历史");
         RecommendationConstants.MODULE_STR_MAP.put("news_home", "家庭");
         RecommendationConstants.MODULE_STR_MAP.put("news_house", "房产");
-        RecommendationConstants.MODULE_STR_MAP.put("news_media", "视频");
         RecommendationConstants.MODULE_STR_MAP.put("news_military", "军事");
-        RecommendationConstants.MODULE_STR_MAP.put("news_pet", "宠物");
         RecommendationConstants.MODULE_STR_MAP.put("news_photography", "摄影");
-        RecommendationConstants.MODULE_STR_MAP.put("news_politics", "政治");
         RecommendationConstants.MODULE_STR_MAP.put("news_society", "社会");
-        RecommendationConstants.MODULE_STR_MAP.put("news_story", "故事");
-        RecommendationConstants.MODULE_STR_MAP.put("news_traditional_culture", "传统");
         RecommendationConstants.MODULE_STR_MAP.put("news_travel", "旅游");
     }
 

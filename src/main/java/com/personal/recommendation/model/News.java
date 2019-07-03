@@ -1,7 +1,5 @@
 package com.personal.recommendation.model;
 
-import java.util.Date;
-
 /**
  * 新闻类
  */
@@ -10,7 +8,7 @@ public class News {
 
     private Long id;
     private String content;
-    private Date newsTime;
+    private String newsTime;
     private String url;
     private String title;
     private String moduleLevel1;
@@ -34,11 +32,11 @@ public class News {
         this.content = content;
     }
 
-    public Date getNewsTime() {
+    public String getNewsTime() {
         return newsTime;
     }
 
-    public void setNewsTime(Date newsTime) {
+    public void setNewsTime(String newsTime) {
         this.newsTime = newsTime;
     }
 

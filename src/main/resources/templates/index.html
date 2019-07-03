@@ -7,69 +7,72 @@
 <link rel="stylesheet" href="/css/index.css" type="text/css"/>
 
 <body>
-<div class="top">
-    <div class="title_all" th:id="module_all" th:name="titles" th:onclick="changeClass('all')">
-        全部
-    </div>
-    <ul>
-        <li th:id="module_news_tech" th:name="titles"
-            th:onclick="changeClass('news_tech')" th:text="科技">
-        </li>
-        <li th:id="module_news_entertainment" th:name="titles"
-            th:onclick="changeClass('news_entertainment')" th:text="娱乐">
-        </li>
-        <li th:id="module_news_game" th:name="titles"
-            th:onclick="changeClass('news_game')" th:text="游戏">
-        </li>
-        <li th:id="module_news_sports" th:name="titles"
-            th:onclick="changeClass('news_sports')" th:text="体育">
-        </li>
-        <li th:id="module_news_car" th:name="titles"
-            th:onclick="changeClass('news_car')" th:text="汽车">
-        </li>
-        <li th:id="module_news_finance" th:name="titles"
-            th:onclick="changeClass('news_finance')" th:text="财经">
-        </li>
-        <div class="hover_module">
-            <li th:id="module_more" th:name="titles" th:text="更多"></li>
-            <ul th:each="module : ${moduleMap}">
-                <li th:id="${'module_'+module.key}" th:name="titles"
-                    th:onclick="changeClass([[${module.key}]])" th:text="${module.value}">
-                </li>
-            </ul>
+    <div class="top">
+        <div class="title_all" th:id="module_all" th:name="titles" th:onclick="changeClass('all')">
+            全部
         </div>
-    </ul>
+        <ul>
+            <li th:id="module_news_tech" th:name="titles"
+                th:onclick="changeClass('news_tech')" th:text="科技">
+            </li>
+            <li th:id="module_news_entertainment" th:name="titles"
+                th:onclick="changeClass('news_entertainment')" th:text="娱乐">
+            </li>
+            <li th:id="module_news_game" th:name="titles"
+                th:onclick="changeClass('news_game')" th:text="游戏">
+            </li>
+            <li th:id="module_news_sports" th:name="titles"
+                th:onclick="changeClass('news_sports')" th:text="体育">
+            </li>
+            <li th:id="module_news_car" th:name="titles"
+                th:onclick="changeClass('news_car')" th:text="汽车">
+            </li>
+            <li th:id="module_news_finance" th:name="titles"
+                th:onclick="changeClass('news_finance')" th:text="财经">
+            </li>
+            <div class="hover_module">
+                <li th:id="module_more" th:name="titles" th:text="更多"></li>
+                <ul th:each="module : ${moduleMap}">
+                    <li th:id="${'module_'+module.key}" th:name="titles"
+                        th:onclick="changeClass([[${module.key}]])" th:text="${module.value}">
+                    </li>
+                </ul>
+            </div>
+        </ul>
 
-</div>
-<table id="customers">
-    <tr>
-        <th>标题</th>
-        <th>分类一</th>
-        <th>分类二</th>
-        <th>分类三</th>
-        <th>推荐算法</th>
-    </tr>
-    <tr style="background: beige;" onMouseOver="this.style.background='lightblue'"
-        onMouseOut="this.style.background='beige'" th:each="news : ${recommendationList}">
-        <td th:name="rows" th:id="${news.moduleLevel1}" style="width:60%">
-            <a target="_blank" th:href="@{'/test/news/'+${userId}+'/'+${news.id}}" th:text="${news.title}"></a>
-        </td>
-        <td th:name="rows" th:id="${news.moduleLevel1}" style="width:10%" th:text="${news.moduleLevel1}"></td>
-        <td th:name="rows" th:id="${news.moduleLevel1}" style="width:10%" th:text="${news.moduleLevel2}"></td>
-        <td th:name="rows" th:id="${news.moduleLevel1}" style="width:10%" th:text="${news.moduleLevel3}"></td>
-        <td th:name="rows" th:id="${news.moduleLevel1}" style="width:10%" th:text="${news.algorithm}"></td>
-    </tr>
-    <tr th:each="news : ${newsList}">
-        <td style="width:60%" th:name="rows" th:id="${news.moduleLevel1}">
-            <a target="_blank" th:href="@{'/test/news/'+${userId}+'/'+${news.id}}" th:text="${news.title}"></a>
-            <a th:name="${news.moduleLevel1}"></a>
-        </td>
-        <td style="width:10%" th:text="${news.moduleLevel1}" th:name="rows" th:id="${news.moduleLevel1}"></td>
-        <td style="width:10%" th:text="${news.moduleLevel2}" th:name="rows" th:id="${news.moduleLevel1}"></td>
-        <td style="width:10%" th:text="${news.moduleLevel3}" th:name="rows" th:id="${news.moduleLevel1}"></td>
-        <td style="width:10%" th:text="${news.algorithm}" th:name="rows" th:id="${news.moduleLevel1}"></td>
-    </tr>
-</table>
+    </div>
+    <table id="customers">
+        <tr>
+            <th>标题</th>
+            <th>分类一</th>
+            <th>分类二</th>
+            <th>分类三</th>
+            <th>发布时间</th>
+            <th>推荐算法</th>
+        </tr>
+        <tr style="background: beige;" onMouseOver="this.style.background='lightblue'"
+            onMouseOut="this.style.background='beige'" th:each="news : ${recommendationList}">
+            <td th:name="rows" th:id="${news.moduleLevel1}" style="width:50%">
+                <a target="_blank" th:href="@{'/recommend/news/'+${userId}+'/'+${news.id}}" th:text="${news.title}"></a>
+            </td>
+            <td th:name="rows" th:id="${news.moduleLevel1}" style="width:10%" th:text="${news.moduleLevel1}"></td>
+            <td th:name="rows" th:id="${news.moduleLevel1}" style="width:10%" th:text="${news.moduleLevel2}"></td>
+            <td th:name="rows" th:id="${news.moduleLevel1}" style="width:10%" th:text="${news.moduleLevel3}"></td>
+            <td th:name="rows" th:id="${news.moduleLevel1}" style="width:10%" th:text="${news.newsTime}"></td>
+            <td th:name="rows" th:id="${news.moduleLevel1}" style="width:10%" th:text="${news.algorithm}"></td>
+        </tr>
+        <tr th:each="news : ${newsList}">
+            <td style="width:50%" th:name="rows" th:id="${news.moduleLevel1}">
+                <a target="_blank" th:href="@{'/recommend/news/'+${userId}+'/'+${news.id}}" th:text="${news.title}"></a>
+                <a th:name="${news.moduleLevel1}"></a>
+            </td>
+            <td style="width:10%" th:text="${news.moduleLevel1}" th:name="rows" th:id="${news.moduleLevel1}"></td>
+            <td style="width:10%" th:text="${news.moduleLevel2}" th:name="rows" th:id="${news.moduleLevel1}"></td>
+            <td style="width:10%" th:text="${news.moduleLevel3}" th:name="rows" th:id="${news.moduleLevel1}"></td>
+            <td style="width:10%" th:text="${news.newsTime}" th:name="rows" th:id="${news.moduleLevel1}"></td>
+            <td style="width:10%" th:text="${news.algorithm}" th:name="rows" th:id="${news.moduleLevel1}"></td>
+        </tr>
+    </table>
 </body>
 <script th:inline="javascript">
     function changeClass(value) {

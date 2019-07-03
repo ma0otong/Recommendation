@@ -191,7 +191,7 @@ public class RecommendationUtil {
         return "<html><head><h1 style='text-align:center'>" +
                 news.getTitle() +
                 "</h1><h4 style='color:gray;text-align:right'>" +
-                DateUtil.formatDate(news.getNewsTime()) +
+                news.getNewsTime() +
                 "</h4></head><meta charset=\"UTF-8\"><title>" +
                 news.getTitle() +
                 "</title></head><body style='width:80%;margin-left:10%'>" +

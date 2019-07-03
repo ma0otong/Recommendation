@@ -1,7 +1,7 @@
 package com.personal.recommendation.utils;
 
+
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -33,16 +33,6 @@ public class DateUtil {
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         return new Timestamp(calendar.getTime().getTime());
-    }
-
-    /**
-     * 格式化日期
-     * @param date Date
-     * @return String
-     */
-    public static String formatDate(Date date){
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss");
-        return dateFormat.format(date);
     }
 
 }

@@ -12,6 +12,7 @@ import com.personal.recommendation.model.Recommendations;
 import com.personal.recommendation.model.Users;
 import com.personal.recommendation.service.NewsService;
 import com.personal.recommendation.service.RecommendationCalculator;
+import com.personal.recommendation.utils.DateUtil;
 import com.personal.recommendation.utils.RecommendationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

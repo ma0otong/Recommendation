@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 @Controller
-@RequestMapping("/test")
+@RequestMapping("/recommend")
 public class TestController {
 
     private static final Logger logger = Logger.getLogger(TestController.class);
