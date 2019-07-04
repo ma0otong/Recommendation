@@ -18,6 +18,8 @@
   ***Ansj*** 是开源的中文分词器，是ICTLAS的Java版本，采用了Bigram+HMM分词模型，在Bigram分词的基础上，识别未登录词，以提高分词准确度。Ansj在易用性、稳定性、准确性及分词效率上都取得了不错的平衡。
 
   ***TF-IDF(term frequency–inverse document frequency)*** 是一种用于信息检索与数据挖掘的常用加权技术。TF意思是词频(Term Frequency)，IDF意思是逆文本频率指数(Inverse Document Frequency)。TF-IDF是一种统计方法，用以评估字词对于一个文件集或一个语料库中的其中一份文件的重要程度。字词的重要性随着它在文件中出现的次数成正比增加，但同时会随着它在语料库中出现的频率成反比下降。TF-IDF加权的各种形式常被搜索引擎应用，作为文件与用户查询之间相关程度的度量或评级。除了TF-IDF以外，因特网上的搜索引擎还会使用基于链接分析的评级方法，以确定文件在搜寻结果中出现的顺序。
+  
+![头像](https://github.com/ma0otong/Recommendation/blob/master/img/cb.jpg)
 
 ### 基于Apache Mahout的用户协同过滤 
 **名词介绍:**
