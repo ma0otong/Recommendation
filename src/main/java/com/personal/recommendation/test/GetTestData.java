@@ -11,6 +11,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.List;
 
+/**
+ * 暂时生成测试数据
+ */
 @SuppressWarnings("unused")
 public class GetTestData {
 

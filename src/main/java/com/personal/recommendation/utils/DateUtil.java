@@ -24,15 +24,4 @@ public class DateUtil {
         return new Timestamp(calendar.getTime().getTime());
     }
 
-    @SuppressWarnings("unused")
-    public static Timestamp getCertainTimestamp() {
-        // 得到日历
-        Calendar calendar = Calendar.getInstance();
-        // 设置为前beforeNum天
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        return new Timestamp(calendar.getTime().getTime());
-    }
-
 }

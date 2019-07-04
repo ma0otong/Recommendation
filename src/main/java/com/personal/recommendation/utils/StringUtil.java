@@ -1,5 +1,8 @@
 package com.personal.recommendation.utils;
 
+/**
+ * 字符串工具类
+ */
 class StringUtil {
 
     /**

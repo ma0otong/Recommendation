@@ -33,8 +33,8 @@ public interface NewsLogsDAO {
     @Select("select news_id from " + TABLE + " where user_id = #{userId}")
     List<Long> getNewsIdsByUser(@Param("userId") Long userId);
 
-    @Update("update " + TABLE + " set view_time = #{viewTime} where id = #{id}")
-    void updateViewTime(@Param("viewTime") Date viewTime, @Param("id") Long id);
+    @Update("update " + TABLE + " set view_time = now() where id = #{id}")
+    void updateById(@Param("id") Long id);
 
     @Insert("insert into " + TABLE + " set user_id = #{userId},news_id = #{newsId},news_module = #{newsModule}")
     void insertNewsLogs(NewsLogs newsLog);

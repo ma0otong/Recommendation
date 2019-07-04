@@ -37,8 +37,8 @@ public class NewsLogsManager {
         return newsLogsDAO.getNewsIdsByUser(userId);
     }
 
-    public void updateViewTimeById(Date viewTime, Long id) {
-        newsLogsDAO.updateViewTime(viewTime, id);
+    public void updateById(Long id) {
+        newsLogsDAO.updateById(id);
     }
 
     public void insertNewsLogs(NewsLogs newsLog){

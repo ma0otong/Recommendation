@@ -6,7 +6,6 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -41,8 +40,8 @@ public interface NewsDAO {
     @Select("select * from " + TABLE + " where limit #{limit} offset #{offset}")
     List<News> getNewsByLimitOffset(@Param("limit") int limit, @Param("offset") int offset);
 
-    @Select("select * from " + TABLE + " where module_level_1 = #{moduleLevel} and news_time > #{newsTime} limit #{limit}")
-    List<News> getNewsByModuleLimit(@Param("moduleLevel") String moduleLevel, @Param("limit") int limit, @Param("newsTime") Date newsTime);
+    @Select("select * from " + TABLE + " where module_level_1 = #{moduleLevel} order by news_time desc limit #{limit}")
+    List<News> getNewsByModuleLimit(@Param("moduleLevel") String moduleLevel, @Param("limit") int limit);
 
     @Select("select min(id) from " + TABLE)
     Long getMinId();

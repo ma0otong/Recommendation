@@ -9,7 +9,6 @@ import org.apache.mahout.cf.taste.impl.common.FastIDSet;
 import org.apache.mahout.cf.taste.impl.common.RefreshHelper;
 import org.apache.mahout.cf.taste.impl.recommender.AbstractRecommender;
 import org.apache.mahout.cf.taste.impl.recommender.EstimatedPreferenceCapper;
-import org.apache.mahout.cf.taste.impl.recommender.GenericUserBasedRecommender;
 import org.apache.mahout.cf.taste.impl.recommender.TopItems;
 import org.apache.mahout.cf.taste.model.DataModel;
 import org.apache.mahout.cf.taste.neighborhood.UserNeighborhood;
@@ -18,8 +17,6 @@ import org.apache.mahout.cf.taste.recommender.RecommendedItem;
 import org.apache.mahout.cf.taste.recommender.Rescorer;
 import org.apache.mahout.cf.taste.similarity.UserSimilarity;
 import org.apache.mahout.common.LongPair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -31,7 +28,6 @@ import java.util.concurrent.Callable;
  */
 @SuppressWarnings("unused")
 public class MyGenericUserBasedRecommender extends AbstractRecommender implements MyUserBasedRecommender {
-    private static final Logger log = LoggerFactory.getLogger(GenericUserBasedRecommender.class);
     private final UserNeighborhood neighborhood;
     private final UserSimilarity similarity;
     private final RefreshHelper refreshHelper;
@@ -58,16 +54,13 @@ public class MyGenericUserBasedRecommender extends AbstractRecommender implement
 
     public List<RecommendedItem> recommend(long userID, int howMany, IDRescorer rescorer) throws TasteException {
         Preconditions.checkArgument(howMany >= 1, "howMany must be at least 1");
-        log.info("Recommending items for user ID '{}'", userID);
         long[] theNeighborhood = this.neighborhood.getUserNeighborhood(userID);
         if (theNeighborhood.length == 0) {
             return Collections.emptyList();
         } else {
             FastIDSet allItemIDs = this.getAllOtherItems(theNeighborhood, userID);
             org.apache.mahout.cf.taste.impl.recommender.TopItems.Estimator<Long> estimator = new MyGenericUserBasedRecommender.Estimator(userID, theNeighborhood);
-            List<RecommendedItem> topItems = MyTopItems.getTopItems(howMany, allItemIDs.iterator(), rescorer, estimator);
-            log.info("Recommendations are: {}", topItems);
-            return topItems;
+            return MyTopItems.getTopItems(howMany, allItemIDs.iterator(), rescorer, estimator);
         }
     }
 

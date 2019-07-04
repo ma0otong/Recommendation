@@ -3,16 +3,15 @@ package com.personal.recommendation.utils;
 import com.personal.recommendation.constants.RecommendationConstants;
 import com.personal.recommendation.model.News;
 import org.ansj.app.keyword.Keyword;
-import org.apache.log4j.Logger;
 
 import java.util.*;
 
 import static java.util.stream.Collectors.groupingBy;
 
-@SuppressWarnings("unused")
+/**
+ * 推荐算法工具类
+ */
 public class RecommendationUtil {
-
-    private static final Logger logger = Logger.getLogger(RecommendationUtil.class);
 
     /**
      * 获得用户的关键词列表和新闻关键词列表的匹配程度
@@ -51,31 +50,6 @@ public class RecommendationUtil {
         for (Long item : toBeDeleteItemSet) {
             map.remove(item);
         }
-    }
-
-    /**
-     * 使用 Map按value进行排序
-     *
-     * @param oriMap map
-     * @return Map<Long, Double>
-     */
-    public static LinkedHashMap<Long, Double> sortLDMapByValue(LinkedHashMap<Long, Double> oriMap) {
-        if (oriMap == null || oriMap.isEmpty()) {
-            return null;
-        }
-        LinkedHashMap<Long, Double> sortedMap = new LinkedHashMap<>();
-        List<Map.Entry<Long, Double>> entryList = new ArrayList<>(
-                oriMap.entrySet());
-        entryList.sort(new LongDoubleComparator());
-
-        Iterator<Map.Entry<Long, Double>> iter = entryList.iterator();
-        Map.Entry<Long, Double> tmpEntry;
-
-        while (iter.hasNext()) {
-            tmpEntry = iter.next();
-            sortedMap.put(tmpEntry.getKey(), tmpEntry.getValue());
-        }
-        return sortedMap;
     }
 
     /**
@@ -131,16 +105,19 @@ public class RecommendationUtil {
      */
     public static HashMap<String, Object> getNewsTFIDFMap(List<News> newsList) {
         HashMap<String, Object> newsTFIDFMap = new HashMap<>();
-        try {
-            // 提取出所有新闻的关键词列表及对应TF-IDf值，并放入一个map中
-            for (News news : newsList) {
+
+        // 提取出所有新闻的关键词列表及对应TF-IDf值，并放入一个map中
+        for (News news : newsList) {
+            try {
                 List<Keyword> keywords = TFIDFAnalyzer.getTfIdf(news.getContent());
                 newsTFIDFMap.put(String.valueOf(news.getId()), keywords);
                 newsTFIDFMap.put(news.getId() + RecommendationConstants.MODULE_ID_STR, news.getModuleLevel1());
+            } catch (Exception e) {
+                System.out.println("NewsId : " + news.getId() + " error .");
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+
         return newsTFIDFMap;
     }
 
@@ -150,19 +127,17 @@ public class RecommendationUtil {
      * @param list List<News>
      * @return List<News>
      */
-    public static List<News> groupList(List<News> list, Map<String, String> moduleMap) {
+    public static List<News> groupList(List<News> list) {
         List<News> newList = new ArrayList<>();
-        Map<String, List<News>> map = list.stream().collect(groupingBy(News::getModuleLevel1));
-        for (String key : map.keySet()) {
-            for (News news : map.get(key)) {
-                newList.add(news);
-                String module = RecommendationConstants.MODULE_STR_MAP.get(news.getModuleLevel1());
-                if(module != null) {
-                    if (!moduleMap.containsKey(module)) {
-                        moduleMap.put(news.getModuleLevel1(), module);
-                    }
+        try {
+            if (list != null && !list.isEmpty()) {
+                Map<String, List<News>> map = list.stream().collect(groupingBy(News::getModuleLevel1));
+                for (String key : map.keySet()) {
+                    newList.addAll(map.get(key));
                 }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return newList;
     }
@@ -175,16 +150,16 @@ public class RecommendationUtil {
      * @param count int
      * @return List<Long>
      */
-    public static List<Long> getRandomLongList(Long min, Long max, int count) {
+    public static Set<Long> getRandomLongSet(Long min, Long max, int count) {
         int minInt = min.intValue();
         int maxInt = max.intValue();
         Random random = new Random();
-        List<Long> list = new ArrayList<>();
-        for (int i = 0; i < count; i++) {
-            int num = new Random().nextInt(maxInt - minInt) + minInt;
-            list.add(Long.parseLong(String.valueOf(num)));
+        Set<Long> set = new HashSet<>();
+        while (set.size() < count) {
+            int num = random.nextInt(maxInt - minInt) + minInt;
+            set.add(Long.parseLong(String.valueOf(num)));
         }
-        return list;
+        return set;
     }
 
     public static String formatHtmlContent(News news) {
@@ -198,7 +173,7 @@ public class RecommendationUtil {
                 news.getContent() +
                 "</body><br/>" +
                 "<p style='color:gray;text-align:right'>文章来源:<a href=" +
-                news.getUrl() +">" + news.getUrl() + "</a></p></html>";
+                news.getUrl() + ">" + news.getUrl() + "</a></p></html>";
     }
 
 }

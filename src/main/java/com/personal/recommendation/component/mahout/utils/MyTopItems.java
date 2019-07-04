@@ -21,6 +21,7 @@ import java.util.*;
  */
 @SuppressWarnings({"unused","unchecked"})
 public final class MyTopItems {
+
     private static final long[] NO_IDS = new long[0];
 
     private MyTopItems() {

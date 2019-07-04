@@ -11,8 +11,6 @@ import java.util.*;
  */
 public class TFIDFAnalyzer {
 
-    private static final KeyWordComputer keywordComputer = new KeyWordComputer(RecommendationConstants.KEY_WORDS_NUM);
-
     /**
      *
      * @param content 文本内容
@@ -21,7 +19,7 @@ public class TFIDFAnalyzer {
     @SuppressWarnings("unchecked")
     public static List<Keyword> getTfIdf(String content) {
         content = StringUtil.getContent(content);
-        return keywordComputer.computeArticleTfidf(content);
+        return new KeyWordComputer(RecommendationConstants.KEY_WORDS_NUM).computeArticleTfidf(content);
     }
 
     public static void main(String[] args) {

@@ -5,14 +5,12 @@ import com.personal.recommendation.model.News;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.List;
 
 /**
  * 新闻Manager
  */
 @Service
-@SuppressWarnings("unused")
 public class NewsManager  {
 
     private final NewsDAO newsDAO;
@@ -29,16 +27,12 @@ public class NewsManager  {
         return newsDAO.getNewsByIds(newsIds);
     }
 
-    public List<News> getNewsByLimitOffset(int limit, int offset){
-        return newsDAO.getNewsByLimitOffset(limit, offset);
-    }
-
     public List<String> getModuleLevel(){
         return newsDAO.getModuleLevel();
     }
 
-    public List<News> getNewsByModuleLimit(String moduleLevel, int limit, Date newsTime){
-        return newsDAO.getNewsByModuleLimit(moduleLevel, limit, newsTime);
+    public List<News> getNewsByModuleLimit(String moduleLevel, int limit){
+        return newsDAO.getNewsByModuleLimit(moduleLevel, limit);
     }
 
     public Long getMinId(){

@@ -1,6 +1,5 @@
 package com.personal.recommendation.constants;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,10 +27,13 @@ public interface RecommendationConstants {
     int HOT_DATA_DAYS = 7;
 
     // 热点数据最大条数
-    int MAX_HOT_NUM = 50;
+    int MAX_HOT_NUM = 100;
 
-    // 热点数据最大条数
-    int MAX_NEWS_POOL_NUM = 500;
+    // 内容池大小
+    int MAX_NEWS_POOL_NUM = 800;
+
+    // 最大展示内容个数
+    int MAX_SHOWN_NEWS_POOL = 500;
 
     // 推荐新闻数
     int N = 20;
@@ -40,7 +42,7 @@ public interface RecommendationConstants {
     double CF_RATE = 0.2;
 
     // 基于内容最大相关条数
-    int CB_MAX_NEWS = 1000;
+    int CB_MAX_NEWS = 200;
 
     // 用户profile个数
     int CB_PROFILE_MAX = 10;
@@ -58,16 +60,13 @@ public interface RecommendationConstants {
     int THREAD_NUM = 4;
 
     // 点击数大于此值重新计算推荐
-    int MAX_RECOMMEND_VIEWS = 5;
+    int MAX_RECOMMEND_VIEWS = 4;
 
     // rec viewed
     int RECOMMENDATION_VIEWED = 1;
 
     // rec not viewed
     int RECOMMENDATION_NOT_VIEWED = 0;
-
-    // 生成随机新闻池
-    ArrayList<Long> NEWS_POOL_LIST = new ArrayList<>();
 
     // module map
     Map<String, String> MODULE_STR_MAP = new HashMap<>();

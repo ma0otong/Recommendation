@@ -1,6 +1,6 @@
 package com.personal.recommendation.quartz;
 
-import com.personal.recommendation.config.Initialize;
+import com.personal.recommendation.component.thread.RecommendationNewsPoolThread;
 import com.personal.recommendation.service.impl.HotDataRecommendation;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -20,13 +20,13 @@ public class ScheduledTask {
      */
     @Scheduled(cron = "0 0/30 * * * ?")
     private void formNewsPoolList() {
-        Initialize.formNewsPoolList();
+        RecommendationNewsPoolThread.clear();
     }
 
     /**
      * 定时更新热点新闻
      */
-    @Scheduled(cron = "0 0/3 * * * ?")
+    @Scheduled(cron = "0 0/30 * * * ?")
     private void formTopHotNewsList() {
         HotDataRecommendation.formTopHotNewsList();
     }

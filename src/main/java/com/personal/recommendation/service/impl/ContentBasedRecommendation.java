@@ -10,7 +10,7 @@ import com.personal.recommendation.model.NewsLogs;
 import com.personal.recommendation.model.Users;
 import com.personal.recommendation.service.RecommendationAlgorithmFactory;
 import com.personal.recommendation.service.RecommendationAlgorithmService;
-import com.personal.recommendation.service.RecommendationCalculator;
+import com.personal.recommendation.component.thread.RecommendationCalculateThread;
 import com.personal.recommendation.utils.*;
 import org.ansj.app.keyword.Keyword;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,15 +38,25 @@ public class ContentBasedRecommendation implements RecommendationAlgorithmServic
         this.newsLogsManager = newsLogsManager;
     }
 
+    /**
+     * 加入算法工厂
+     */
     @PostConstruct
     void init() {
         RecommendationAlgorithmFactory.addHandler(RecommendationEnum.CB.getCode(), this);
     }
 
+    /**
+     * 基于内容推荐方法
+     * @param user Users
+     * @param recNum int
+     * @param recommendedNews List<Long>
+     * @param browsedNews List<Long>
+     * @return Set<Long>
+     */
     @Override
     public Set<Long> recommend(Users user, int recNum, List<Long> recommendedNews, List<Long> browsedNews) {
         Long userId = user.getId();
-
         // prefList衰减更新
         userPrefDecRefresh(user);
         // 更新用户prefList
@@ -64,13 +74,17 @@ public class ContentBasedRecommendation implements RecommendationAlgorithmServic
             userPrefListMap.put(user.getId(), JsonUtil.jsonPrefListToMap(user.getPrefList()));
 
             List<News> newsList = new ArrayList<>();
-            // 获取用户profile
+            // 获取用户profile, 保证取到用户没有浏览过和推荐过的CB_MAX_NEWS数量内容进行比较
             Map<String, Integer> moduleMap = getModuleListFromProfile(user.getUserProfile());
-            for(String module : moduleMap.keySet()){
-                newsList.addAll(newsManager.getNewsByModuleLimit(module, moduleMap.get(module),
-                        DateUtil.getDateBeforeDays(RecommendationConstants.HOT_DATA_DAYS)));
+            while(newsList.size() < RecommendationConstants.CB_MAX_NEWS) {
+                for (String module : moduleMap.keySet()) {
+                    for(News moduleNews : newsManager.getNewsByModuleLimit(module, moduleMap.get(module))){
+                        if(!browsedNews.contains(moduleNews.getId()) && !recommendedNews.contains(moduleNews.getId())){
+                            newsList.add(moduleNews);
+                        }
+                    }
+                }
             }
-
             // 计算Item TF-IDF值
             for (News news : newsList) {
                 List<Keyword> keywordList = TFIDFAnalyzer.getTfIdf(news.getContent());
@@ -93,9 +107,9 @@ public class ContentBasedRecommendation implements RecommendationAlgorithmServic
             }
             // 去除匹配值为0的项目
             RecommendationUtil.removeZeroItem(tempMatchMap);
-            if (!(tempMatchMap.toString().equals("{}"))) {
+            if (!tempMatchMap.isEmpty()) {
                 toBeRecommended = Objects.requireNonNull(tempMatchMap).keySet();
-                toBeRecommended = RecommendationCalculator.resultHandle(recommendedNews, browsedNews,
+                toBeRecommended = RecommendationCalculateThread.resultHandle(recommendedNews, browsedNews,
                         toBeRecommended, userId, RecommendationEnum.CB.getDesc(), recNum, false);
 
             }
@@ -103,7 +117,6 @@ public class ContentBasedRecommendation implements RecommendationAlgorithmServic
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return toBeRecommended;
 
     }
@@ -121,10 +134,9 @@ public class ContentBasedRecommendation implements RecommendationAlgorithmServic
                 DateUtil.getDateBeforeDays(RecommendationConstants.HOT_DATA_DAYS), userId,
                 RecommendationConstants.RECENT_VIEWED_NUM);
         List<Long> userBrowsedList = newsLogsList.stream().map(NewsLogs::getNewsId).collect(Collectors.toList());
-        // 如果前一天没有浏览记录（比如新闻门户出状况暂时关停的情况下，
-        // 或者初期用户较少的时候均可能出现这种情况），则不需要执行后续更新步骤
-        if (userBrowsedList.size() == 0)
+        if (userBrowsedList.size() == 0){
             return;
+        }
 
         // 用户喜好关键词列表：userPrefListMap:<String(userId),String(json))>
         CustomizedHashMap<String, CustomizedHashMap<String, Double>> userPrefList =
@@ -145,6 +157,9 @@ public class ContentBasedRecommendation implements RecommendationAlgorithmServic
                     : userPrefList.get(moduleStr);
             // 获得新闻的（关键词：TF-IDF值）map
             List<Keyword> keywordList = (List<Keyword>) newsTFIDFMap.get(String.valueOf(newsId));
+            if(keywordList == null){
+                continue;
+            }
             for (Keyword keyword : keywordList) {
                 String name = keyword.getName();
                 if (rateMap.containsKey(name)) {
@@ -161,6 +176,8 @@ public class ContentBasedRecommendation implements RecommendationAlgorithmServic
             String profile = getUserProfile(newsLogsList);
             user.setUserProfile(profile);
             usersManager.updatePrefAndProfileById(userId, userPrefList.toString(), profile);
+
+            user.setPrefList(userPrefList.toString());
         } catch (Exception e) {
             e.printStackTrace();
         }

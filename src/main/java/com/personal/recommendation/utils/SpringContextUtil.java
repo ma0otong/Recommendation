@@ -2,7 +2,9 @@ package com.personal.recommendation.utils;
 
 import org.springframework.context.ApplicationContext;
 
-@SuppressWarnings("unused")
+/**
+ * 静态注入工具类
+ */
 public class SpringContextUtil {
 
     //spring上下文
@@ -30,27 +32,6 @@ public class SpringContextUtil {
      */
     public static Object getBean(String name) {
         return getApplicationContext().getBean(name);
-    }
-
-    /**
-     * 通过name获取 Bean.
-     *
-     * @param clazz Class
-     * @return T
-     */
-    public static <T> T getBean(Class<T> clazz) {
-        return getApplicationContext().getBean(clazz);
-    }
-
-    /**
-     * 通过name,以及Clazz返回指定的Bean
-     *
-     * @param name String
-     * @param clazz Class
-     * @return T
-     */
-    public static <T> T getBean(String name, Class<T> clazz) {
-        return getApplicationContext().getBean(name, clazz);
     }
 
 }

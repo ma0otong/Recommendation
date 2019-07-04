@@ -7,11 +7,11 @@ import com.personal.recommendation.component.mahout.service.MyRecommender;
 import com.personal.recommendation.model.Users;
 import com.personal.recommendation.service.RecommendationAlgorithmFactory;
 import com.personal.recommendation.service.RecommendationAlgorithmService;
-import com.personal.recommendation.service.RecommendationCalculator;
+import com.personal.recommendation.component.thread.RecommendationCalculateThread;
 import com.personal.recommendation.utils.DBConnectionUtil;
-import org.apache.mahout.cf.taste.impl.model.jdbc.MySQLBooleanPrefJDBCDataModel;
 import org.apache.mahout.cf.taste.impl.neighborhood.NearestNUserNeighborhood;
 import org.apache.mahout.cf.taste.impl.similarity.LogLikelihoodSimilarity;
+import org.apache.mahout.cf.taste.model.DataModel;
 import org.apache.mahout.cf.taste.neighborhood.UserNeighborhood;
 import org.apache.mahout.cf.taste.recommender.RecommendedItem;
 import org.apache.mahout.cf.taste.similarity.UserSimilarity;
@@ -31,8 +31,14 @@ public class MahoutUserBasedCollaborativeRecommendation implements Recommendatio
         RecommendationAlgorithmFactory.addHandler(RecommendationEnum.CF.getCode(), this);
     }
 
+
     /**
-     * 给特定的一批用户进行新闻推荐
+     * 协同过滤推荐方法
+     * @param user Users
+     * @param recNum int
+     * @param recommendedNews List<Long>
+     * @param browsedNews List<Long>
+     * @return Set<Long>
      */
     @Override
     public Set<Long> recommend(Users user, int recNum, List<Long> recommendedNews, List<Long> browsedNews) {
@@ -43,7 +49,7 @@ public class MahoutUserBasedCollaborativeRecommendation implements Recommendatio
 
         try {
 
-            MySQLBooleanPrefJDBCDataModel dataModel = new DBConnectionUtil().getMySQLJDBCDataModel();
+            DataModel dataModel = DBConnectionUtil.getDataModel();
 
             // 构造相似度度量器
             UserSimilarity similarity = new LogLikelihoodSimilarity(dataModel);
@@ -58,7 +64,7 @@ public class MahoutUserBasedCollaborativeRecommendation implements Recommendatio
                 toBeRecommended.add(recItem.getItemID());
             }
 
-            toBeRecommended = RecommendationCalculator.resultHandle(recommendedNews, browsedNews, toBeRecommended,
+            toBeRecommended = RecommendationCalculateThread.resultHandle(recommendedNews, browsedNews, toBeRecommended,
                     userId, RecommendationEnum.CF.getDesc(), recNum, false);
 
         } catch (Exception e) {

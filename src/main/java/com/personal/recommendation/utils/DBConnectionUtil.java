@@ -3,12 +3,16 @@ package com.personal.recommendation.utils;
 import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
 import com.jfinal.plugin.c3p0.C3p0Plugin;
 import org.apache.log4j.Logger;
+import org.apache.mahout.cf.taste.common.TasteException;
 import org.apache.mahout.cf.taste.impl.model.jdbc.MySQLBooleanPrefJDBCDataModel;
+import org.apache.mahout.cf.taste.impl.model.jdbc.ReloadFromJDBCDataModel;
+import org.apache.mahout.cf.taste.model.DataModel;
+import org.apache.mahout.cf.taste.model.JDBCDataModel;
 
 import javax.sql.DataSource;
 
 /**
- * 数据库工具类
+ * mahout据库工具类
  */
 public class DBConnectionUtil {
 
@@ -20,33 +24,39 @@ public class DBConnectionUtil {
     public static String USERNAME;
     public static String PASSWORD;
 
+    private static DataModel dataModel = null;
+
     /**
      * 初始化
      */
-    private void initialize() {
+    private static void initialize() {
         try {
             CP = new C3p0Plugin(URL, USERNAME, PASSWORD);
 
             ActiveRecordPlugin arp = new ActiveRecordPlugin(CP);
 
-            if (CP.start() && arp.start())
-                logger.info("数据库连接池插件启动成功......");
-            else
-                logger.error("c3p0插件启动失败！");
-
-            logger.info("数据库初始化工作完毕！");
+            if (!CP.start() || !arp.start())
+                logger.error("cp start or arp start failed !");
         } catch (Exception e) {
-            logger.error("数据库连接初始化错误！");
+            logger.error("DB connection failed !");
         }
     }
 
-    private DataSource getDataSource() {
+    /**
+     * 获取DataSource
+     * @return DataSource
+     */
+    private static DataSource getDataSource() {
         if (CP == null)
             initialize();
         return CP.getDataSource();
     }
 
-    public MySQLBooleanPrefJDBCDataModel getMySQLJDBCDataModel() {
+    /**
+     * 获取MySQLBooleanPrefJDBCDataModel
+     * @return MySQLBooleanPrefJDBCDataModel
+     */
+    private static MySQLBooleanPrefJDBCDataModel getMySQLJDBCDataModel() {
         // 构造MySQL偏好表
         // 用户浏览时间列名
         String PREF_TABLE_TIME = "view_time";
@@ -59,5 +69,21 @@ public class DBConnectionUtil {
 
         return new MySQLBooleanPrefJDBCDataModel(getDataSource(), PREF_TABLE, PREF_TABLE_USER_ID, PREF_TABLE_NEWS_ID,
                 PREF_TABLE_TIME);
+    }
+
+    /**
+     * 获取DataModel
+     * @return DataModel
+     */
+    public static DataModel getDataModel(){
+        if(dataModel == null) {
+            JDBCDataModel dm = getMySQLJDBCDataModel();
+            try {
+                dataModel = new ReloadFromJDBCDataModel(dm);
+            } catch (TasteException e) {
+                e.printStackTrace();
+            }
+        }
+        return dataModel;
     }
 }

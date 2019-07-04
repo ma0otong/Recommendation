@@ -1,4 +1,4 @@
-package com.personal.recommendation.service;
+package com.personal.recommendation.component.thread;
 
 import com.personal.recommendation.constants.RecommendationConstants;
 import com.personal.recommendation.constants.RecommendationEnum;
@@ -8,6 +8,7 @@ import com.personal.recommendation.manager.RecommendationsManager;
 import com.personal.recommendation.manager.UsersManager;
 import com.personal.recommendation.model.Recommendations;
 import com.personal.recommendation.model.Users;
+import com.personal.recommendation.service.RecommendationAlgorithmFactory;
 import com.personal.recommendation.service.impl.HotDataRecommendation;
 import com.personal.recommendation.utils.RecommendationUtil;
 import com.personal.recommendation.utils.SpringContextUtil;
@@ -18,11 +19,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingDeque;
 
 /**
- * 推荐任务处理
+ * 异步推荐请求处理
  */
-public class RecommendationCalculator implements Runnable {
+public class RecommendationCalculateThread implements Runnable {
 
-    private static final Logger logger = Logger.getLogger(RecommendationCalculator.class);
+    private static final Logger logger = Logger.getLogger(RecommendationCalculateThread.class);
 
     // 请求队列
     private static LinkedBlockingDeque<Long> requestQueue = new LinkedBlockingDeque<>();
@@ -41,9 +42,9 @@ public class RecommendationCalculator implements Runnable {
      *
      * @param userId 用户id
      */
-    public void addRequest(Long userId) {
+    public static void addRequest(Long userId) {
+        logger.info("Add recommendation calculation task for user : " + userId);
         requestQueue.add(userId);
-        logger.info("UserId : " + userId + ", calculation task added .");
     }
 
     /**
@@ -52,10 +53,11 @@ public class RecommendationCalculator implements Runnable {
     @Override
     public void run() {
         try {
-            logger.info("RecommendServiceThread - " + Thread.currentThread().getName() + " executed ...");
+            logger.info("RecommendationCalculateThread - " + Thread.currentThread().getName() + " executed ...");
             while (true) {
                 Long userId = requestQueue.poll();
                 if (userId != null) {
+                    long start = new Date().getTime();
                     Users user = usersManager.getUserById(userId);
                     // 用户存在
                     if (user != null) {
@@ -100,9 +102,10 @@ public class RecommendationCalculator implements Runnable {
                         hrRecommended = new HashSet<>(toBeRecommended);
                         hrRecommended.removeAll(cfRecommended);
                         hrRecommended.removeAll(cbRecommended);
-                        logger.info(String.format("Total recommended size : %s, fromCF : %s, fromCB : %s, fromHR : %s .",
-                                toBeRecommended.size(), cfRecommended.size(), cbRecommended.size(), hrRecommended.size()));
-
+                        logger.info(String.format("Total recommended size : %s, fromCF : %s, fromCB : %s, fromHR : %s ," +
+                                        " time cost : %s s, user : %s, requestQueue size : %s.",
+                                toBeRecommended.size(), cfRecommended.size(), cbRecommended.size(), hrRecommended.size(),
+                                (double) (new Date().getTime() - start) / 1000, userId, requestQueue.size()));
                     }
                 } else {
                     try {
@@ -133,35 +136,25 @@ public class RecommendationCalculator implements Runnable {
                                          Set<Long> set, Long uid, String algorithmType, int recNum, boolean fetchFromHotList) {
         HashSet<Long> toBeRecommended = new HashSet<>(set);
         int count = toBeRecommended.size();
-        List<Long> expiredNews = new ArrayList<>();
         // 不从hotList补充, 开始过滤
         if (!fetchFromHotList) {
-            logger.info("ToBeRecommended size (before filter) : " + toBeRecommended.size());
             // 过滤掉已经推荐过的新闻
             toBeRecommended.removeAll(recommendedNews);
-            logger.info("ToBeRecommended size (after recommended filter) : " + toBeRecommended.size());
             // 过滤掉用户已经看过的新闻
             toBeRecommended.removeAll(browsedNews);
-            logger.info("ToBeRecommended size (after browsed news filter) : " + toBeRecommended.size());
             // 如果可推荐新闻数目超过了recNum, 则去掉一部分多余的可推荐新闻
             if (toBeRecommended.size() > recNum) {
                 RecommendationUtil.removeOverNews(toBeRecommended, recNum);
-                logger.info("ToBeRecommended size (after oversize filter) : " + toBeRecommended.size());
             }
 
             // 写入recommendation结果表
             for (Long recId : toBeRecommended) {
-                Recommendations recommendation = recommendationsManager.getRecommendationByUserAndNewsId(uid, recId);
-                if (recommendation != null) {
-                    recommendationsManager.updateFeedBackById(recommendation.getId(), RecommendationConstants.RECOMMENDATION_NOT_VIEWED);
-                } else {
-                    recommendation = new Recommendations();
-                    recommendation.setDeriveAlgorithm(algorithmType);
-                    recommendation.setUserId(uid);
-                    recommendation.setNewsId(recId);
-                    recommendation.setFeedback(RecommendationConstants.RECOMMENDATION_NOT_VIEWED);
-                    recommendationsManager.insertRecommendations(recommendation);
-                }
+                Recommendations recommendation = new Recommendations();
+                recommendation.setDeriveAlgorithm(algorithmType);
+                recommendation.setUserId(uid);
+                recommendation.setNewsId(recId);
+                recommendation.setFeedback(RecommendationConstants.RECOMMENDATION_NOT_VIEWED);
+                RecommendationDbThread.addRecommendationsRequest(recommendation);
             }
         } else {
             // 算法推荐数量不够, 从热点新闻中补充
@@ -175,27 +168,18 @@ public class RecommendationCalculator implements Runnable {
                     }
                     Long repId = HotDataRecommendation.topHotNewsList.get(index++);
                     if (repId != null && repId != 0) {
-                        if (recommendedNews.contains(repId) || browsedNews.contains(repId)) {
-                            expiredNews.add(repId);
-                        } else {
-                            if (!toBeRecommended.contains(repId)) {
-                                toBeRecommended.add(repId);
-                                replenished++;
-                            } else {
-                                logger.info("Recommendation already added, skip .");
-                            }
+                        if (!recommendedNews.contains(repId) && !browsedNews.contains(repId)
+                                && !toBeRecommended.contains(repId)) {
+                            toBeRecommended.add(repId);
+                            replenished++;
                         }
                     } else {
-                        logger.info("Hot list replenish ended, list size : " + HotDataRecommendation.topHotNewsList.size());
                         break;
                     }
                 }
             }
         }
-        if (!expiredNews.isEmpty())
-            logger.info("NewsIds : " + expiredNews + " from hot list was browsed or recommended, skip .");
 
-        logger.info("Recommendation finished ! Total recommendation size : " + toBeRecommended.size());
         return toBeRecommended;
     }
 

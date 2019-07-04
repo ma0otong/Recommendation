@@ -2,6 +2,11 @@ package com.personal.recommendation.utils;
 
 import java.util.LinkedHashMap;
 
+/**
+ * 自定义HashMap类
+ * @param <K>
+ * @param <V>
+ */
 public class CustomizedHashMap<K, V> extends LinkedHashMap<K, V> {
     private static final long serialVersionUID = 1L;
 

@@ -48,29 +48,26 @@
             <th>分类二</th>
             <th>分类三</th>
             <th>发布时间</th>
-            <th>推荐算法</th>
         </tr>
         <tr style="background: beige;" onMouseOver="this.style.background='lightblue'"
             onMouseOut="this.style.background='beige'" th:each="news : ${recommendationList}">
-            <td th:name="rows" th:id="${news.moduleLevel1}" style="width:50%">
+            <td th:name="rows" th:id="${news.moduleLevel1}" style="width:55%">
                 <a target="_blank" th:href="@{'/recommend/news/'+${userId}+'/'+${news.id}}" th:text="${news.title}"></a>
             </td>
             <td th:name="rows" th:id="${news.moduleLevel1}" style="width:10%" th:text="${news.moduleLevel1}"></td>
             <td th:name="rows" th:id="${news.moduleLevel1}" style="width:10%" th:text="${news.moduleLevel2}"></td>
             <td th:name="rows" th:id="${news.moduleLevel1}" style="width:10%" th:text="${news.moduleLevel3}"></td>
-            <td th:name="rows" th:id="${news.moduleLevel1}" style="width:10%" th:text="${news.newsTime}"></td>
-            <td th:name="rows" th:id="${news.moduleLevel1}" style="width:10%" th:text="${news.algorithm}"></td>
+            <td th:name="rows" th:id="${news.moduleLevel1}" style="width:15%" th:text="${news.newsTime}"></td>
         </tr>
         <tr th:each="news : ${newsList}">
-            <td style="width:50%" th:name="rows" th:id="${news.moduleLevel1}">
+            <td style="width:55%" th:name="rows" th:id="${news.moduleLevel1}">
                 <a target="_blank" th:href="@{'/recommend/news/'+${userId}+'/'+${news.id}}" th:text="${news.title}"></a>
                 <a th:name="${news.moduleLevel1}"></a>
             </td>
             <td style="width:10%" th:text="${news.moduleLevel1}" th:name="rows" th:id="${news.moduleLevel1}"></td>
             <td style="width:10%" th:text="${news.moduleLevel2}" th:name="rows" th:id="${news.moduleLevel1}"></td>
             <td style="width:10%" th:text="${news.moduleLevel3}" th:name="rows" th:id="${news.moduleLevel1}"></td>
-            <td style="width:10%" th:text="${news.newsTime}" th:name="rows" th:id="${news.moduleLevel1}"></td>
-            <td style="width:10%" th:text="${news.algorithm}" th:name="rows" th:id="${news.moduleLevel1}"></td>
+            <td style="width:15%" th:text="${news.newsTime}" th:name="rows" th:id="${news.moduleLevel1}"></td>
         </tr>
     </table>
 </body>

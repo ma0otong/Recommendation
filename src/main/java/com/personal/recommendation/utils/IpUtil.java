@@ -4,9 +4,17 @@ import javax.servlet.http.HttpServletRequest;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+/**
+ * 获取ip工具类
+ */
 public class IpUtil {
+    /**
+     * 从HttpServletRequest中获取ip
+     * @param request HttpServletRequest
+     * @return String
+     */
     public static String getIpAddr(HttpServletRequest request) {
-        String ipAddress = null;
+        String ipAddress;
         try {
             ipAddress = request.getHeader("x-forwarded-for");
             if (ipAddress == null || ipAddress.length() == 0 || "unknown".equalsIgnoreCase(ipAddress)) {

@@ -1,8 +1,6 @@
 package com.personal.recommendation.controller;
 
 import com.personal.recommendation.service.NewsService;
-import com.personal.recommendation.utils.IpUtil;
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -12,9 +10,8 @@ import java.util.*;
 
 @Controller
 @RequestMapping("/recommend")
+@SuppressWarnings("unused")
 public class TestController {
-
-    private static final Logger logger = Logger.getLogger(TestController.class);
 
     private final NewsService newsService;
 
@@ -23,8 +20,8 @@ public class TestController {
         this.newsService = newsService;
     }
 
-    @RequestMapping(value = "/index/{userId}")
-    public String index(Map<String, Object> paramMap, @PathVariable("userId") Long userId) {
+    @GetMapping(value = "/index/{userId}")
+    public String index(Map<String, Object> paramMap, @PathVariable("userId") Long userId, HttpServletRequest request) {
         newsService.userNewsList(userId, paramMap);
         return "index";
     }
@@ -32,8 +29,18 @@ public class TestController {
     @GetMapping(value = "/news/{userId}/{newsId}")
     @ResponseBody
     public String getNewsDetail(@PathVariable("userId") Long userId, @PathVariable("newsId") Long newsId, HttpServletRequest request) {
-        String ip = IpUtil.getIpAddr(request);
-        logger.info("Client ip : " + ip + ", url : /news/" + userId + "/" + newsId);
+        return newsService.newsDetail(userId, newsId);
+    }
+
+    @GetMapping(value = "/index")
+    public String index2(Map<String, Object> paramMap, @RequestParam("userId") Long userId, HttpServletRequest request) {
+        newsService.userNewsList(userId, paramMap);
+        return "index";
+    }
+
+    @GetMapping(value = "/news")
+    @ResponseBody
+    public String getNewsDetail2(@RequestParam("userId") Long userId, @RequestParam("newsId") Long newsId, HttpServletRequest request) {
         return newsService.newsDetail(userId, newsId);
     }
 
