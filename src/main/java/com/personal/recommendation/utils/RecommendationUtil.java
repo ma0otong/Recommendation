@@ -6,8 +6,6 @@ import org.ansj.app.keyword.Keyword;
 
 import java.util.*;
 
-import static java.util.stream.Collectors.groupingBy;
-
 /**
  * 推荐算法工具类
  */
@@ -59,21 +57,44 @@ public class RecommendationUtil {
      * @return Map<String, Integer>
      */
     public static CustomizedHashMap<String, Double> sortSDMapByValue(Map<String, Double> oriMap) {
-        if (oriMap == null || oriMap.isEmpty()) {
-            return null;
-        }
         CustomizedHashMap<String, Double> sortedMap = new CustomizedHashMap<>();
+        if (oriMap == null || oriMap.isEmpty()) {
+            return sortedMap;
+        }
+
         List<Map.Entry<String, Double>> entryList = new ArrayList<>(
                 oriMap.entrySet());
         entryList.sort(new StringDoubleComparator());
-
         Iterator<Map.Entry<String, Double>> iter = entryList.iterator();
         Map.Entry<String, Double> tmpEntry;
-        int maxSize = 1;
-        while (iter.hasNext() && maxSize < RecommendationConstants.CB_MAX_MODULE_KEYWORD_SIZE) {
+        while (iter.hasNext()) {
             tmpEntry = iter.next();
             sortedMap.put(tmpEntry.getKey(), tmpEntry.getValue());
-            maxSize++;
+        }
+
+        return sortedMap;
+    }
+
+    /**
+     * 使用 Map按value进行排序
+     *
+     * @param oriMap map
+     * @return Map<String, Integer>
+     */
+    public static CustomizedHashMap<Long, Double> sortLDMapByValue(Map<Long, Double> oriMap) {
+        CustomizedHashMap<Long, Double> sortedMap = new CustomizedHashMap<>();
+        if (oriMap == null || oriMap.isEmpty()) {
+            return sortedMap;
+        }
+
+        List<Map.Entry<Long, Double>> entryList = new ArrayList<>(
+                oriMap.entrySet());
+        entryList.sort(new LongDoubleComparator());
+        Iterator<Map.Entry<Long, Double>> iter = entryList.iterator();
+        Map.Entry<Long, Double> tmpEntry;
+        while (iter.hasNext()) {
+            tmpEntry = iter.next();
+            sortedMap.put(tmpEntry.getKey(), tmpEntry.getValue());
         }
 
         return sortedMap;
@@ -105,15 +126,13 @@ public class RecommendationUtil {
      */
     public static HashMap<String, Object> getNewsTFIDFMap(List<News> newsList) {
         HashMap<String, Object> newsTFIDFMap = new HashMap<>();
-
         // 提取出所有新闻的关键词列表及对应TF-IDf值，并放入一个map中
         for (News news : newsList) {
             try {
-                List<Keyword> keywords = TFIDFAnalyzer.getTfIdf(news.getContent());
+                List<Keyword> keywords = getKeywords(news.getTag());
                 newsTFIDFMap.put(String.valueOf(news.getId()), keywords);
-                newsTFIDFMap.put(news.getId() + RecommendationConstants.MODULE_ID_STR, news.getModuleLevel1());
+                newsTFIDFMap.put(news.getId() + RecommendationConstants.MODULE_ID_STR, news.getModule());
             } catch (Exception e) {
-                System.out.println("NewsId : " + news.getId() + " error .");
                 e.printStackTrace();
             }
         }
@@ -124,17 +143,14 @@ public class RecommendationUtil {
     /**
      * List按news module分类
      *
-     * @param list List<News>
+     * @param map Map<String, List<News>>
      * @return List<News>
      */
-    public static List<News> groupList(List<News> list) {
+    public static List<News> groupList(Map<String, List<News>> map) {
         List<News> newList = new ArrayList<>();
         try {
-            if (list != null && !list.isEmpty()) {
-                Map<String, List<News>> map = list.stream().collect(groupingBy(News::getModuleLevel1));
-                for (String key : map.keySet()) {
-                    newList.addAll(map.get(key));
-                }
+            for(String key : map.keySet()){
+                newList.addAll(map.get(key));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -143,37 +159,58 @@ public class RecommendationUtil {
     }
 
     /**
-     * 根据范围随机获取count个随机数
-     *
-     * @param min   Long
-     * @param max   Long
-     * @param count int
-     * @return List<Long>
+     * 将keyword字符串转化为List
+     * @param keywordsStr String
+     * @return List
      */
-    public static Set<Long> getRandomLongSet(Long min, Long max, int count) {
-        int minInt = min.intValue();
-        int maxInt = max.intValue();
-        Random random = new Random();
-        Set<Long> set = new HashSet<>();
-        while (set.size() < count) {
-            int num = random.nextInt(maxInt - minInt) + minInt;
-            set.add(Long.parseLong(String.valueOf(num)));
+    public static List<Keyword> getKeywords(String keywordsStr){
+        List<Keyword> keywords = new ArrayList<>();
+        String[] strs = keywordsStr.split(RecommendationConstants.SEPARATOR);
+        for(String name : strs){
+            keywords.add(new Keyword(name, 1D));
         }
-        return set;
+        return keywords;
     }
 
-    public static String formatHtmlContent(News news) {
+    /**
+     * 整理详情页html内容
+     *
+     * @param userId        Long
+     * @param newsCrawl        NewsConfig
+     * @param relatedNews List<NewsConfig>
+     * @return String
+     */
+    public static String formatHtmlContent(Long userId, News newsCrawl, List<News> relatedNews) {
+        StringBuilder relatedSb = new StringBuilder();
+        if(relatedNews != null && !relatedNews.isEmpty()) {
+            relatedSb.append("<hr /><p style='text-align:left'>相关推荐:</p>");
+            relatedSb.append("<table style='text-align:center;margin-left:5%;border-collapse: collapse;'>");
+            for (News rNews : relatedNews) {
+                if(rNews.getId().equals(newsCrawl.getId())){
+                    continue;
+                }
+                String linkUrl = "/recommend/news/" + userId + "/" + rNews.getId();
+                relatedSb.append("<tr style='border-top:1px solid black;'>");
+                relatedSb.append("<td style='width:80%;text-align:left;'><a target='_blank' href=").append(linkUrl);
+                relatedSb.append("><p>").append(rNews.getTitle()).append("</p>");
+                relatedSb.append("<img src=\"").append(rNews.getImageUrl()).append("\" alt=\"\" />").append("</a></td>");
+                relatedSb.append("<td style='width:20%'>").append(rNews.getSource()).append("</td>");
+                relatedSb.append("</tr>");
+            }
+            relatedSb.append("</table>");
+        }
+
         return "<html><head><h1 style='text-align:center'>" +
-                news.getTitle() +
-                "</h1><h4 style='color:gray;text-align:right'>" +
-                news.getNewsTime() +
+                newsCrawl.getTitle() +
+                "</h1><h4 style='color:gray;text-align:left'>" +
+                newsCrawl.getSource() + "    " + newsCrawl.getNewsTime() +
                 "</h4></head><meta charset=\"UTF-8\"><title>" +
-                news.getTitle() +
+                newsCrawl.getTitle() +
                 "</title></head><body style='width:80%;margin-left:10%'>" +
-                news.getContent() +
+                newsCrawl.getContent() +
                 "</body><br/>" +
                 "<p style='color:gray;text-align:right'>文章来源:<a href=" +
-                news.getUrl() + ">" + news.getUrl() + "</a></p></html>";
+                newsCrawl.getUrl() + ">" + newsCrawl.getUrl() + "</a></p>" + relatedSb.toString() + "</html>";
     }
 
 }

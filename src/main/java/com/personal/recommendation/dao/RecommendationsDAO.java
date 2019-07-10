@@ -7,7 +7,6 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -18,8 +17,8 @@ public interface RecommendationsDAO {
 
     String TABLE = "recommendations";
 
-    @Select("select * from " + TABLE + " where user_id = #{userId} and feedback = 0 order by derive_time desc")
-    List<Recommendations> getNewsByUserId(@Param("userId") long userId);
+    @Select("select news_id from " + TABLE + " where user_id = #{userId} and feedback = 0 order by derive_time desc")
+    List<Long> getNotViewedIdsByUserId(@Param("userId") long userId);
 
     @Select("select news_id from " + TABLE + " where user_id = #{userId}")
     List<Long> getNewsIdByUserId(@Param("userId") long userId);
@@ -30,6 +29,10 @@ public interface RecommendationsDAO {
     @Select("select * from " + TABLE + " where user_id = #{userId} and news_id = #{newsId}")
     Recommendations getRecommendationByUserAndNewsId(@Param("userId") Long userId, @Param("newsId") Long newsId);
 
+    @Update("update " + TABLE + " set feedback = #{feedback} where news_id = #{newsId} and user_id = #{userId}")
+    void updateFeedBackByUserNewsId(@Param("userId") Long userId, @Param("newsId") Long newsId, @Param("feedback") int feedback);
+
     @Update("update " + TABLE + " set feedback = #{feedback} where id = #{id}")
     void updateFeedBackById(@Param("id") Long id, @Param("feedback") int feedback);
+
 }

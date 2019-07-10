@@ -8,12 +8,6 @@ import java.util.Map;
  */
 public interface RecommendationConstants {
 
-    // 设置TF-IDF提取的关键词数目
-    int KEY_WORDS_NUM = 10;
-
-    // 每个module的关键字数量
-    int CB_MAX_MODULE_KEYWORD_SIZE = 10;
-
     // 最近浏览条数
     int RECENT_VIEWED_NUM = 50;
 
@@ -28,12 +22,6 @@ public interface RecommendationConstants {
 
     // 热点数据最大条数
     int MAX_HOT_NUM = 100;
-
-    // 内容池大小
-    int MAX_NEWS_POOL_NUM = 800;
-
-    // 最大展示内容个数
-    int MAX_SHOWN_NEWS_POOL = 500;
 
     // 推荐新闻数
     int N = 20;
@@ -69,6 +57,24 @@ public interface RecommendationConstants {
     int RECOMMENDATION_NOT_VIEWED = 0;
 
     // module map
-    Map<String, String> MODULE_STR_MAP = new HashMap<>();
+    Map<String, String> MODULE_MAIN_STR_MAP = new HashMap<>();
+
+    // module map
+    Map<String, String> MODULE_MORE_STR_MAP = new HashMap<>();
+
+    // 每个module内容池数量
+    int MAIN_MODULE_POOL_SIZE = 1000;
+
+    // 每个more module内容池数量
+    int MORE_MODULE_POOL_SIZE = 500;
+
+    // 取内容池比例
+    int SHOWN_RATE = 10;
+
+    // suggest数量
+    int SUGGEST_NUM = 15;
+
+    // 相似推荐数量
+    int SEARCH_NUM = 21;
 
 }

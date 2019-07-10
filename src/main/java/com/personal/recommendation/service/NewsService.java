@@ -22,4 +22,12 @@ public interface NewsService {
      */
     String newsDetail(Long userId, Long newsId);
 
+    /**
+     * 获取搜索结果
+     * @param keyword String
+     */
+    void getSearch(String keyword, Long userId, Map<String, Object> paramMap);
+
+    String getSuggestData(String keyword, Long userId);
+
 }

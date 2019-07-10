@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Search</title>
+</head>
+<link rel="stylesheet" href="/css/index.css" type="text/css"/>
+
+<body>
+    <div id="userId" th:value="${userId}" style="display: none;"></div>
+    <div class="container">
+        <div class="jd_header" style="position: fixed;top: 5px;left: 38%;height:50px;width:500px">
+            <input style="height:50px;width:100%;font-size: 40px;" type="search" class="header_search" id="searchInput" placeholder="输入关键字搜索" />
+            <i class="header_glass"></i>
+        </div>
+    </div>
+
+    <table id="customers" style="margin-top: 65px">
+        <tr>
+            <th>标题</th>
+            <th>作者</th>
+            <th>分类</th>
+            <th>发布时间</th>
+        </tr>
+        <tr th:each="news : ${newsList}">
+            <td style="width:55%;text-align:left" th:name="rows" th:id="${news.module}">
+                <a target="_blank" th:href="@{'/recommend/news/'+${userId}+'/'+${news.id}}">
+                    <p style="margin-left:15%" target="_blank" th:href="@{'/recommend/news/'+${userId}+'/'+${news.id}}" th:text="${news.title}"></p>
+                    <img style="margin-left:15%" th:if="${news.imageUrl != ''}" th:src="${news.imageUrl}" alt=""/>
+                </a>
+            </td>
+            <td style="width:10%" th:text="${news.source}" th:name="rows" th:id="${news.module}"></td>
+            <td style="width:10%" th:text="${news.module}" th:name="rows" th:id="${news.module}"></td>
+            <td style="width:25%" th:text="${news.newsTime}" th:name="rows" th:id="${news.module}"></td>
+        </tr>
+    </table>
+</body>
+
+<script>
+    var input = document.getElementById('searchInput');
+    input.oninput = function() {
+        console.log(input.value);
+    };
+
+    // 回车事件
+    document.onkeydown = function (event) {
+        var e = event || window.event;
+        if (e && e.keyCode === 13) {
+            var text = document.getElementById("searchInput").value;
+            if(text.length > 0 && text.length < 100) {
+                var userId = [[${userId}]];
+                window.open('/recommend/search/' + userId + '?keyword=' + text);
+            }
+        }
+    };
+</script>
+</html>

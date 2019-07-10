@@ -3,7 +3,6 @@ package com.personal.recommendation.component.thread;
 import com.personal.recommendation.constants.RecommendationConstants;
 import com.personal.recommendation.constants.RecommendationEnum;
 import com.personal.recommendation.manager.NewsLogsManager;
-import com.personal.recommendation.manager.NewsManager;
 import com.personal.recommendation.manager.RecommendationsManager;
 import com.personal.recommendation.manager.UsersManager;
 import com.personal.recommendation.model.Recommendations;
@@ -32,7 +31,6 @@ public class RecommendationCalculateThread implements Runnable {
     public static ConcurrentHashMap<Long, Integer> userLogMap = new ConcurrentHashMap<>();
 
     private static UsersManager usersManager = (UsersManager) SpringContextUtil.getBean("usersManager");
-    private static NewsManager newsManager = (NewsManager) SpringContextUtil.getBean("newsManager");
     private static NewsLogsManager newsLogsManager = (NewsLogsManager) SpringContextUtil.getBean("newsLogsManager");
     private static RecommendationsManager recommendationsManager =
             (RecommendationsManager) SpringContextUtil.getBean("recommendationsManager");
@@ -63,7 +61,10 @@ public class RecommendationCalculateThread implements Runnable {
                     if (user != null) {
                         // prefList为空则初始化prefList
                         if (user.getPrefList() == null || user.getPrefList().isEmpty()) {
-                            usersManager.initializePrefList(user, newsManager.getModuleLevel());
+                            Set<String> moduleSet = new HashSet<>();
+                            moduleSet.addAll(RecommendationConstants.MODULE_MORE_STR_MAP.keySet());
+                            moduleSet.addAll(RecommendationConstants.MODULE_MAIN_STR_MAP.keySet());
+                            usersManager.initializePrefList(user, moduleSet);
                         }
 
                         // 结果map
@@ -71,7 +72,6 @@ public class RecommendationCalculateThread implements Runnable {
 
                         Set<Long> cfRecommended = new HashSet<>();
                         Set<Long> cbRecommended = new HashSet<>();
-                        Set<Long> hrRecommended;
 
                         // 已经推荐过的新闻
                         List<Long> recommendedNews = recommendationsManager.getNewsIdByUserId(userId);
@@ -79,7 +79,7 @@ public class RecommendationCalculateThread implements Runnable {
                         List<Long> browsedNews = newsLogsManager.getNewsIdByUserId(userId);
 
                         // 若无browsedNews直接跳过
-                        if (!browsedNews.isEmpty()) {
+                        if (!browsedNews.isEmpty() && !RecommendationNewsPoolThread.NEWS_POOL_MAP.isEmpty()) {
                             // 先计算协同过滤
                             int neededNum = (int) (RecommendationConstants.CF_RATE * RecommendationConstants.N);
                             toBeRecommended = RecommendationAlgorithmFactory.getHandler(
@@ -94,17 +94,9 @@ public class RecommendationCalculateThread implements Runnable {
                             cbRecommended.removeAll(cfRecommended);
                         }
 
-                        // 最后用hotList补充
-                        if (toBeRecommended.size() < RecommendationConstants.N && !HotDataRecommendation.topHotNewsList.isEmpty()) {
-                            toBeRecommended.addAll(RecommendationAlgorithmFactory.getHandler(RecommendationEnum.HR.getCode()).recommend(user,
-                                    RecommendationConstants.N - toBeRecommended.size(), recommendedNews, browsedNews));
-                        }
-                        hrRecommended = new HashSet<>(toBeRecommended);
-                        hrRecommended.removeAll(cfRecommended);
-                        hrRecommended.removeAll(cbRecommended);
-                        logger.info(String.format("Total recommended size : %s, fromCF : %s, fromCB : %s, fromHR : %s ," +
+                        logger.info(String.format("Total recommended size : %s, fromCF : %s, fromCB : %s," +
                                         " time cost : %s s, user : %s, requestQueue size : %s.",
-                                toBeRecommended.size(), cfRecommended.size(), cbRecommended.size(), hrRecommended.size(),
+                                toBeRecommended.size(), cfRecommended.size(), cbRecommended.size(),
                                 (double) (new Date().getTime() - start) / 1000, userId, requestQueue.size()));
                     }
                 } else {
@@ -130,11 +122,11 @@ public class RecommendationCalculateThread implements Runnable {
      * @param algorithmType    int
      * @param recNum           int
      * @param fetchFromHotList boolean
-     * @return Set<Long>
+     * @return LinkedHashSet<Long>
      */
-    public static Set<Long> resultHandle(List<Long> recommendedNews, List<Long> browsedNews,
-                                         Set<Long> set, Long uid, String algorithmType, int recNum, boolean fetchFromHotList) {
-        HashSet<Long> toBeRecommended = new HashSet<>(set);
+    public static LinkedHashSet<Long> resultHandle(List<Long> recommendedNews, List<Long> browsedNews,
+                                                   LinkedHashSet<Long> set, Long uid, String algorithmType, int recNum, boolean fetchFromHotList) {
+        LinkedHashSet<Long> toBeRecommended = new LinkedHashSet<>(set);
         int count = toBeRecommended.size();
         // 不从hotList补充, 开始过滤
         if (!fetchFromHotList) {

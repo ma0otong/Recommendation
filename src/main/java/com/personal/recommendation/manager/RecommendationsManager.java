@@ -20,8 +20,8 @@ public class RecommendationsManager {
         this.recommendationsDAO = recommendationsDAO;
     }
 
-    public List<Recommendations> getNewsByUserId(Long userId){
-        return recommendationsDAO.getNewsByUserId(userId);
+    public List<Long> getNotViewedIdsByUserId(Long userId){
+        return recommendationsDAO.getNotViewedIdsByUserId(userId);
     }
 
     public List<Long> getNewsIdByUserId(Long userId){
@@ -38,6 +38,10 @@ public class RecommendationsManager {
 
     public void updateFeedBackById(Long id, int feedback){
         recommendationsDAO.updateFeedBackById(id, feedback);
+    }
+
+    public void updateFeedBackByUserNewsId(Long userId, Long newsId, int feedback){
+        recommendationsDAO.updateFeedBackByUserNewsId(userId, newsId, feedback);
     }
 
 }

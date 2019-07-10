@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 用户Manager
@@ -60,7 +61,7 @@ public class UsersManager {
         usersDAO.updatePrefAndProfileById(userId, newPrefStr, userProfile);
     }
 
-    public void initializePrefList(Users user, List<String> moduleList) {
+    public void initializePrefList(Users user, Set<String> moduleList) {
         // prefList为空则初始化prefList
         StringBuilder newPrefStr = new StringBuilder("{");
         for (String moduleName : moduleList) {

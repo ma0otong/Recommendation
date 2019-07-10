@@ -45,7 +45,7 @@ public class MahoutUserBasedCollaborativeRecommendation implements Recommendatio
         Long userId = user.getId();
 
         // 保存推荐结果
-        Set<Long> toBeRecommended = new HashSet<>();
+        LinkedHashSet<Long> toBeRecommended = new LinkedHashSet<>();
 
         try {
 

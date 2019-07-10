@@ -26,4 +26,20 @@ public class JsonUtil {
         return map;
     }
 
+    /**
+     * 将新闻tag字符串转换为map
+     */
+    public static CustomizedHashMap<String, Double> jsonTagListToMap(String srcJson) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        CustomizedHashMap<String, Double> map = null;
+        try {
+            map = objectMapper.readValue(srcJson, new TypeReference<CustomizedHashMap<String, Double>>() {
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return map;
+    }
+
 }

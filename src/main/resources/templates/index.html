@@ -2,11 +2,19 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Demo</title>
+    <title>Index</title>
 </head>
 <link rel="stylesheet" href="/css/index.css" type="text/css"/>
 
 <body>
+    <div class="container">
+        <div class="jd_header" style="position: fixed;top: 5px;left: 38%;height:50px;width:500px;border:1px solid black">
+            <input style="height:45px;width:100%;font-size: 33px;" type="search" class="header_search" id="searchInput" placeholder="输入关键字搜索" />
+            <i class="header_glass"></i>
+        </div>
+        <div id="suggest" style="position: fixed;top: 57px;left: 38%;height:50px;width:600px;display: none;background: white"></div>
+    </div>
+
     <div class="top">
         <div class="title_all" th:id="module_all" th:name="titles" th:onclick="changeClass('all')">
             全部
@@ -39,38 +47,82 @@
                 </ul>
             </div>
         </ul>
-
     </div>
-    <table id="customers">
+    <table id="customers" style="margin-top: 65px">
         <tr>
             <th>标题</th>
-            <th>分类一</th>
-            <th>分类二</th>
-            <th>分类三</th>
+            <th>作者</th>
+            <th>分类</th>
             <th>发布时间</th>
         </tr>
         <tr style="background: beige;" onMouseOver="this.style.background='lightblue'"
             onMouseOut="this.style.background='beige'" th:each="news : ${recommendationList}">
-            <td th:name="rows" th:id="${news.moduleLevel1}" style="width:55%">
-                <a target="_blank" th:href="@{'/recommend/news/'+${userId}+'/'+${news.id}}" th:text="${news.title}"></a>
+            <td th:name="rows" th:id="${news.module}" style="width:55%;text-align:left">
+                <a target="_blank" th:href="@{'/recommend/news/'+${userId}+'/'+${news.id}}">
+                    <p style="margin-left:15%" target="_blank" th:href="@{'/recommend/news/'+${userId}+'/'+${news.id}}" th:text="${news.title}"></p>
+                    <img style="margin-left:15%" th:if="${news.imageUrl != ''}" th:src="${news.imageUrl}" alt=""/>
+                </a>
             </td>
-            <td th:name="rows" th:id="${news.moduleLevel1}" style="width:10%" th:text="${news.moduleLevel1}"></td>
-            <td th:name="rows" th:id="${news.moduleLevel1}" style="width:10%" th:text="${news.moduleLevel2}"></td>
-            <td th:name="rows" th:id="${news.moduleLevel1}" style="width:10%" th:text="${news.moduleLevel3}"></td>
-            <td th:name="rows" th:id="${news.moduleLevel1}" style="width:15%" th:text="${news.newsTime}"></td>
+            <td th:name="rows" th:id="${news.module}" style="width:10%" th:text="${news.source}"></td>
+            <td th:name="rows" th:id="${news.module}" style="width:10%" th:text="${news.module}"></td>
+            <td th:name="rows" th:id="${news.module}" style="width:25%" th:text="${news.newsTime}"></td>
         </tr>
         <tr th:each="news : ${newsList}">
-            <td style="width:55%" th:name="rows" th:id="${news.moduleLevel1}">
-                <a target="_blank" th:href="@{'/recommend/news/'+${userId}+'/'+${news.id}}" th:text="${news.title}"></a>
-                <a th:name="${news.moduleLevel1}"></a>
+            <td style="width:55%;text-align:left" th:name="rows" th:id="${news.module}">
+                <a target="_blank" th:href="@{'/recommend/news/'+${userId}+'/'+${news.id}}">
+                    <p style="margin-left:15%" target="_blank" th:href="@{'/recommend/news/'+${userId}+'/'+${news.id}}" th:text="${news.title}"></p>
+                    <img style="margin-left:15%" th:if="${news.imageUrl != ''}" th:src="${news.imageUrl}" alt=""/>
+                </a>
             </td>
-            <td style="width:10%" th:text="${news.moduleLevel1}" th:name="rows" th:id="${news.moduleLevel1}"></td>
-            <td style="width:10%" th:text="${news.moduleLevel2}" th:name="rows" th:id="${news.moduleLevel1}"></td>
-            <td style="width:10%" th:text="${news.moduleLevel3}" th:name="rows" th:id="${news.moduleLevel1}"></td>
-            <td style="width:15%" th:text="${news.newsTime}" th:name="rows" th:id="${news.moduleLevel1}"></td>
+            <td style="width:10%" th:text="${news.source}" th:name="rows" th:id="${news.module}"></td>
+            <td style="width:10%" th:text="${news.module}" th:name="rows" th:id="${news.module}"></td>
+            <td style="width:25%" th:text="${news.newsTime}" th:name="rows" th:id="${news.module}"></td>
         </tr>
     </table>
 </body>
+
+<script>
+    var input = document.getElementById('searchInput');
+    input.oninput = function() {
+        loadXMLDoc(input.value);
+    };
+
+    // 回车事件
+    document.onkeydown = function (event) {
+        var e = event || window.event;
+        if (e && e.keyCode === 13) {
+            var text = document.getElementById("searchInput").value;
+            if(text.length > 0 && text.length < 100) {
+                window.open('/recommend/search/' + [[${userId}]] + '?keyword=' + text);
+            }
+        }
+    };
+
+    // ajax
+    function loadXMLDoc(text) {
+        var xmlhttp;
+        if (window.XMLHttpRequest) {
+            //  IE7+, Firefox, Chrome, Opera, Safari 浏览器执行代码
+            xmlhttp = new XMLHttpRequest();
+        } else {
+            // IE6, IE5 浏览器执行代码
+            xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        xmlhttp.onreadystatechange = function () {
+            if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
+                if (xmlhttp.responseText.length > 1) {
+                    document.getElementById("suggest").innerHTML = xmlhttp.responseText;
+                    document.getElementById("suggest").style.display = "";
+                }else{
+                    document.getElementById("suggest").style.display = "none";
+                }
+            }
+        };
+        xmlhttp.open("GET", '/recommend/getSuggestData?userId=' + [[${userId}]] + '&keyword=' + text, true);
+        xmlhttp.send();
+    }
+</script>
+
 <script th:inline="javascript">
     function changeClass(value) {
         // 更新新闻展示

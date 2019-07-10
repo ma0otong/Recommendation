@@ -1,20 +1,22 @@
 package com.personal.recommendation.model;
 
 /**
- * 新闻类
+ * 爬虫新闻bean
  */
 @SuppressWarnings("unused")
 public class News {
 
     private Long id;
     private String content;
+    private String module;
+    private String subModule;
+    private String title;
     private String newsTime;
     private String url;
-    private String title;
-    private String moduleLevel1;
-    private String moduleLevel2;
-    private String moduleLevel3;
-    private String algorithm;
+    private String source;
+    private String imageUrl;
+    private String tag;
+    private Integer classified;
 
     public Long getId() {
         return id;
@@ -24,12 +26,20 @@ public class News {
         this.id = id;
     }
 
-    public String getContent() {
-        return content;
+    public String getModule() {
+        return module;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public void setModule(String module) {
+        this.module = module;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getNewsTime() {
@@ -48,49 +58,51 @@ public class News {
         this.url = url;
     }
 
-    public String getTitle() {
-        return title;
+    public String getSource() {
+        return source;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setSource(String source) {
+        this.source = source;
     }
 
-    public String getModuleLevel1(){
-        return moduleLevel1;
+    public String getImageUrl() {
+        return imageUrl;
     }
 
-    public void setModuleLevel1(String moduleLevel1){
-        this.moduleLevel1 = moduleLevel1;
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
-    public String getModuleLevel2(){
-        return moduleLevel2;
+    public int getClassified() {
+        return classified;
     }
 
-    public void setModuleLevel2(String moduleLevel2){
-        this.moduleLevel2 = moduleLevel2;
+    public void setClassified(int classified) {
+        this.classified = classified;
     }
 
-    public String getModuleLevel3(){
-        return moduleLevel3;
+    public String getContent() {
+        return content;
     }
 
-    public void setModuleLevel3(String moduleLevel3){
-        this.moduleLevel3 = moduleLevel3;
+    public void setContent(String content) {
+        this.content = content;
     }
 
-    public String getAlgorithm() {
-        return algorithm;
+    public String getTag() {
+        return tag;
     }
 
-    public void setAlgorithm(String algorithm) {
-        this.algorithm = algorithm;
+    public void setTag(String tag) {
+        this.tag = tag;
     }
 
-    @Override
-    public String toString(){
-        return id + ":" + moduleLevel1 + ":" + content;
+    public String getSubModule() {
+        return subModule;
     }
 
+    public void setSubModule(String subModule) {
+        this.subModule = subModule;
+    }
 }

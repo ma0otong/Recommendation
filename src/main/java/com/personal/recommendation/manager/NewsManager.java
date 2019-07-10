@@ -8,18 +8,19 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * 新闻Manager
+ * 新闻爬虫内容表Manager
  */
 @Service
-public class NewsManager  {
+public class NewsManager {
 
     private final NewsDAO newsDAO;
+
     @Autowired
     public NewsManager(NewsDAO newsDAO) {
         this.newsDAO = newsDAO;
     }
 
-    public News getNewsById(long newsId){
+    public News getNewsById(Long newsId){
         return newsDAO.getNewsById(newsId);
     }
 
@@ -27,21 +28,12 @@ public class NewsManager  {
         return newsDAO.getNewsByIds(newsIds);
     }
 
-    public List<String> getModuleLevel(){
-        return newsDAO.getModuleLevel();
+    public List<News> getNewsByModuleLimit(String module, int limit){
+        return newsDAO.getNewsByModuleLimit(module, limit);
     }
 
-    public List<News> getNewsByModuleLimit(String moduleLevel, int limit){
-        return newsDAO.getNewsByModuleLimit(moduleLevel, limit);
+    public String getTagById(Long id){
+        return newsDAO.getTagById(id);
     }
-
-    public Long getMinId(){
-        return newsDAO.getMinId();
-    }
-
-    public Long getMaxId(){
-        return newsDAO.getMaxId();
-    }
-
 
 }

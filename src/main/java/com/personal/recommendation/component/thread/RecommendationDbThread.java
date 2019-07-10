@@ -8,6 +8,9 @@ import com.personal.recommendation.model.Recommendations;
 import com.personal.recommendation.utils.SpringContextUtil;
 import org.apache.log4j.Logger;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.LinkedBlockingDeque;
 
 /**
@@ -22,6 +25,9 @@ public class RecommendationDbThread implements Runnable {
 
     // Recommendations请求队列
     private static LinkedBlockingDeque<Recommendations> recommendationsQueue = new LinkedBlockingDeque<>();
+
+    // User browsed map
+    public static Map<Long, List<Long>> userBrowsedMap = new HashMap<>();
 
     private static NewsLogsManager newsLogsManager = (NewsLogsManager) SpringContextUtil.getBean("newsLogsManager");
     private static RecommendationsManager recommendationsManager = (RecommendationsManager) SpringContextUtil.getBean("recommendationsManager");
@@ -73,6 +79,10 @@ public class RecommendationDbThread implements Runnable {
                     } else {
                         newsLogsManager.insertNewsLogs(newsLogs);
                     }
+                    // 更新用户浏览map, 更新推荐feedback
+                    recommendationsManager.updateFeedBackByUserNewsId(newsLogs.getUserId(), newsLogs.getNewsId(),
+                            RecommendationConstants.RECOMMENDATION_VIEWED);
+                    userBrowsedMap.put(newsLogs.getUserId(), newsLogsManager.getNewsIdsByUser(newsLogs.getUserId()));
                 } else {
                     try {
                         Thread.sleep(20);

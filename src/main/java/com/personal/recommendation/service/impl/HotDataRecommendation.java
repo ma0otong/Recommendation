@@ -45,7 +45,7 @@ public class HotDataRecommendation implements RecommendationAlgorithmService {
         Long userId = user.getId();
 
         // 保存推荐结果
-        Set<Long> toBeRecommended = new HashSet<>();
+        LinkedHashSet<Long> toBeRecommended = new LinkedHashSet<>();
 
         if(topHotNewsList.isEmpty()){
             formTopHotNewsList();
@@ -82,4 +82,5 @@ public class HotDataRecommendation implements RecommendationAlgorithmService {
             e.printStackTrace();
         }
     }
+
 }

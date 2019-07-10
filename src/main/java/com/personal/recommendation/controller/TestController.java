@@ -32,16 +32,17 @@ public class TestController {
         return newsService.newsDetail(userId, newsId);
     }
 
-    @GetMapping(value = "/index")
-    public String index2(Map<String, Object> paramMap, @RequestParam("userId") Long userId, HttpServletRequest request) {
-        newsService.userNewsList(userId, paramMap);
-        return "index";
+    @GetMapping(value = "/search/{userId}")
+    public String getSearch(Map<String, Object> paramMap, @PathVariable("userId") Long userId,
+                            @RequestParam("keyword") String keyword, HttpServletRequest request) {
+        newsService.getSearch(keyword, userId, paramMap);
+        return "search";
     }
 
-    @GetMapping(value = "/news")
+    @GetMapping(value = "/getSuggestData")
     @ResponseBody
-    public String getNewsDetail2(@RequestParam("userId") Long userId, @RequestParam("newsId") Long newsId, HttpServletRequest request) {
-        return newsService.newsDetail(userId, newsId);
+    public String getSuggestData(@RequestParam("userId") Long userId, @RequestParam("keyword") String keyword, HttpServletRequest request) {
+        return newsService.getSuggestData(keyword, userId);
     }
 
 }

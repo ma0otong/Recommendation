@@ -1,5 +1,6 @@
 package com.personal.recommendation.service.impl;
 
+import com.personal.recommendation.component.thread.RecommendationNewsPoolThread;
 import com.personal.recommendation.constants.RecommendationConstants;
 import com.personal.recommendation.constants.RecommendationEnum;
 import com.personal.recommendation.manager.NewsLogsManager;
@@ -63,33 +64,41 @@ public class ContentBasedRecommendation implements RecommendationAlgorithmServic
         userPrefRefresh(user);
 
         // 保存推荐结果
-        Set<Long> toBeRecommended = new HashSet<>();
+        LinkedHashSet<Long> toBeRecommended = new LinkedHashSet<>();
 
         try {
             // 新闻及对应关键词列表的Map
             HashMap<Long, List<Keyword>> newsKeyWordsMap = new HashMap<>();
             HashMap<Long, String> newsModuleMap = new HashMap<>();
             // 用户喜好关键词列表
-            HashMap<Long, CustomizedHashMap<String, CustomizedHashMap<String, Double>>> userPrefListMap = new HashMap<>();
-            userPrefListMap.put(user.getId(), JsonUtil.jsonPrefListToMap(user.getPrefList()));
+            CustomizedHashMap<String, CustomizedHashMap<String, Double>> userPrefMap = JsonUtil.jsonPrefListToMap(user.getPrefList());
 
             List<News> newsList = new ArrayList<>();
+            Map<Long, String> newsTagMap = new HashMap<>();
             // 获取用户profile, 保证取到用户没有浏览过和推荐过的CB_MAX_NEWS数量内容进行比较
             Map<String, Integer> moduleMap = getModuleListFromProfile(user.getUserProfile());
             while(newsList.size() < RecommendationConstants.CB_MAX_NEWS) {
                 for (String module : moduleMap.keySet()) {
-                    for(News moduleNews : newsManager.getNewsByModuleLimit(module, moduleMap.get(module))){
-                        if(!browsedNews.contains(moduleNews.getId()) && !recommendedNews.contains(moduleNews.getId())){
+                    int count = 0;
+                    for(News moduleNews : RecommendationNewsPoolThread.NEWS_POOL_MAP.get(module)){
+                        if(!browsedNews.contains(moduleNews.getId())
+                                && !recommendedNews.contains(moduleNews.getId())
+                                && module.equals(moduleNews.getModule())){
                             newsList.add(moduleNews);
+                            newsTagMap.put(moduleNews.getId(), newsManager.getTagById(moduleNews.getId()));
+                            count++;
+                        }
+                        if(count > moduleMap.get(module)){
+                            break;
                         }
                     }
                 }
             }
-            // 计算Item TF-IDF值
+            // 计算tag值
             for (News news : newsList) {
-                List<Keyword> keywordList = TFIDFAnalyzer.getTfIdf(news.getContent());
+                List<Keyword> keywordList = RecommendationUtil.getKeywords(newsTagMap.get(news.getId()));
                 newsKeyWordsMap.put(news.getId(), keywordList);
-                newsModuleMap.put(news.getId(), news.getModuleLevel1());
+                newsModuleMap.put(news.getId(), news.getModule());
             }
 
             Map<Long, Double> tempMatchMap = new HashMap<>();
@@ -99,19 +108,19 @@ public class ContentBasedRecommendation implements RecommendationAlgorithmServic
                 do {
                     Long newsId = ite.next();
                     String moduleStr = newsModuleMap.get(newsId);
-                    if (null != userPrefListMap.get(userId).get(moduleStr)) {
+                    if (null != userPrefMap.get(moduleStr)) {
                         tempMatchMap.put(newsId, RecommendationUtil.getMatchValue(
-                                userPrefListMap.get(userId).get(moduleStr), newsKeyWordsMap.get(newsId)));
+                                userPrefMap.get(moduleStr), newsKeyWordsMap.get(newsId)));
                     }
                 } while (ite.hasNext());
             }
             // 去除匹配值为0的项目
             RecommendationUtil.removeZeroItem(tempMatchMap);
-            if (!tempMatchMap.isEmpty()) {
-                toBeRecommended = Objects.requireNonNull(tempMatchMap).keySet();
+            CustomizedHashMap<Long, Double> sortedMap = RecommendationUtil.sortLDMapByValue(tempMatchMap);
+            if (!sortedMap.isEmpty()) {
+                toBeRecommended.addAll(sortedMap.keySet());
                 toBeRecommended = RecommendationCalculateThread.resultHandle(recommendedNews, browsedNews,
                         toBeRecommended, userId, RecommendationEnum.CB.getDesc(), recNum, false);
-
             }
 
         } catch (Exception e) {
@@ -139,7 +148,7 @@ public class ContentBasedRecommendation implements RecommendationAlgorithmServic
         }
 
         // 用户喜好关键词列表：userPrefListMap:<String(userId),String(json))>
-        CustomizedHashMap<String, CustomizedHashMap<String, Double>> userPrefList =
+        CustomizedHashMap<String, CustomizedHashMap<String, Double>> userPrefMap =
                 JsonUtil.jsonPrefListToMap(user.getPrefList());
 
         // 新闻对应关键词列表与模块ID
@@ -153,8 +162,8 @@ public class ContentBasedRecommendation implements RecommendationAlgorithmServic
             Long newsId = news.getId();
             String moduleStr = (String) newsTFIDFMap.get(newsId + RecommendationConstants.MODULE_ID_STR);
             // 获得对应模块的（关键词：喜好）map
-            CustomizedHashMap<String, Double> rateMap = userPrefList.get(moduleStr) == null ? new CustomizedHashMap<>()
-                    : userPrefList.get(moduleStr);
+            CustomizedHashMap<String, Double> rateMap = userPrefMap.get(moduleStr) == null ? new CustomizedHashMap<>()
+                    : userPrefMap.get(moduleStr);
             // 获得新闻的（关键词：TF-IDF值）map
             List<Keyword> keywordList = (List<Keyword>) newsTFIDFMap.get(String.valueOf(newsId));
             if(keywordList == null){
@@ -169,15 +178,15 @@ public class ContentBasedRecommendation implements RecommendationAlgorithmServic
                 }
             }
             CustomizedHashMap<String, Double> sortedRateMap = RecommendationUtil.sortSDMapByValue(rateMap);
-            userPrefList.put(moduleStr, sortedRateMap);
+            userPrefMap.put(moduleStr, sortedRateMap);
         }
         // 更新preference和用户profile
         try {
             String profile = getUserProfile(newsLogsList);
             user.setUserProfile(profile);
-            usersManager.updatePrefAndProfileById(userId, userPrefList.toString(), profile);
+            usersManager.updatePrefAndProfileById(userId, userPrefMap.toString(), profile);
 
-            user.setPrefList(userPrefList.toString());
+            user.setPrefList(userPrefMap.toString());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -192,7 +201,10 @@ public class ContentBasedRecommendation implements RecommendationAlgorithmServic
             // prefList为空则初始化prefList
             if (user.getPrefList() == null || user.getPrefList().isEmpty()) {
                 // prefList为空则初始化prefList
-                usersManager.initializePrefList(user, newsManager.getModuleLevel());
+                Set<String> moduleSet = new HashSet<>();
+                moduleSet.addAll(RecommendationConstants.MODULE_MORE_STR_MAP.keySet());
+                moduleSet.addAll(RecommendationConstants.MODULE_MAIN_STR_MAP.keySet());
+                usersManager.initializePrefList(user, moduleSet);
             }
 
             // 用于删除喜好值过低的关键词
