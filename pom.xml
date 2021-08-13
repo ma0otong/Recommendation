@@ -72,7 +72,7 @@
 		<dependency>
 			<groupId>com.jfinal</groupId>
 			<artifactId>jfinal</artifactId>
-			<version>3.0</version>
+			<version>4.9.11</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.ansj/ansj_seg -->
